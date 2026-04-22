@@ -1,12 +1,16 @@
 import express from "express";
 import path from "path";
+import { fileURLToPath } from "url";
 import OpenAI from "openai";
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Middlewares
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Variables
 const PORT = process.env.PORT || 3000;
@@ -17,7 +21,7 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// 🔐 Login simple
+// Login simple
 app.post("/login", (req, res) => {
   if (req.body.password === PASSWORD) {
     return res.json({ ok: true });
@@ -25,7 +29,7 @@ app.post("/login", (req, res) => {
   res.status(401).json({ error: "Wrong password" });
 });
 
-// 🧠 Generador de contenido (OpenAI)
+// Generador
 app.post("/generate", async (req, res) => {
   try {
     const { prompt } = req.body;
@@ -35,14 +39,13 @@ app.post("/generate", async (req, res) => {
     }
 
     const response = await client.responses.create({
-      model: "gpt-5.3",
-      input: `Responde en español, estilo contenido viral para redes (TikTok/Instagram), directo y poderoso:\n\n${prompt}`
+      model: "gpt-5.4",
+      input: `Responde en español, útil, claro y directo.\n\n${prompt}`
     });
 
     res.json({
       respuesta: response.output_text
     });
-
   } catch (error) {
     console.error("ERROR:", error);
 
@@ -53,12 +56,11 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-// 🌐 Ruta principal (FIX para Render)
+// Ruta principal
 app.get("/", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "public", "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// 🚀 Start server
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
