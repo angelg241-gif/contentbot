@@ -16,7 +16,9 @@ const PASSWORD = process.env.APP_PASSWORD || "1234";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || "";
 
-const client = new OpenAI({ apiKey: OPENAI_API_KEY });
+const client = new OpenAI({
+  apiKey: OPENAI_API_KEY
+});
 
 const nicheMap = {
   misterio:
@@ -39,44 +41,44 @@ const nicheMap = {
 
 const nicheQueries = {
   misterio: [
-    'mysterious OR unexplained OR strange incident',
-    'haunting OR eerie OR unexplained disappearance',
-    'weird case OR unexplained event'
+    "mysterious OR unexplained OR strange incident",
+    "haunting OR eerie OR unexplained disappearance",
+    "weird case OR unexplained event"
   ],
   historias_reales: [
-    'real bizarre story OR unbelievable true story',
-    'strange real event OR shocking true case',
-    'documented strange case'
+    "real bizarre story OR unbelievable true story",
+    "strange real event OR shocking true case",
+    "documented strange case"
   ],
   casos_sin_resolver: [
-    'unsolved case OR missing person OR unresolved mystery',
-    'cold case OR disappearance unsolved',
-    'unsolved investigation'
+    "unsolved case OR missing person OR unresolved mystery",
+    "cold case OR disappearance unsolved",
+    "unsolved investigation"
   ],
   casos_resueltos: [
-    'case solved after years OR solved mystery shocking',
-    'solved cold case OR investigation resolved',
-    'truth revealed in solved case'
+    "case solved after years OR solved mystery shocking",
+    "solved cold case OR investigation resolved",
+    "truth revealed in solved case"
   ],
   crimen_perturbador: [
-    'disturbing crime case OR bizarre crime',
-    'strange murder investigation OR disturbing case',
-    'criminal case shocking details'
+    "disturbing crime case OR bizarre crime",
+    "strange murder investigation OR disturbing case",
+    "criminal case shocking details"
   ],
   curiosidades: [
-    'viral strange fact OR surprising discovery',
-    'weird science OR unbelievable fact',
-    'bizarre world news'
+    "viral strange fact OR surprising discovery",
+    "weird science OR unbelievable fact",
+    "bizarre world news"
   ],
   motivacion: [
-    'inspiring story OR against all odds',
-    'discipline success story OR personal transformation',
-    'overcame adversity story'
+    "inspiring story OR against all odds",
+    "discipline success story OR personal transformation",
+    "overcame adversity story"
   ],
   drama: [
-    'internet drama OR controversy OR viral backlash',
-    'creator controversy OR online feud',
-    'viral scandal internet'
+    "internet drama OR controversy OR viral backlash",
+    "creator controversy OR online feud",
+    "viral scandal internet"
   ]
 };
 
@@ -84,12 +86,12 @@ function buildSystemPrompt({ niche, platform, duration }) {
   return `
 Eres un estratega experto en contenido viral faceless para TikTok, Instagram Reels y YouTube Shorts.
 
-Responde SOLO JSON válido.
+Debes responder SOLO JSON válido.
 No uses markdown.
 No uses backticks.
 No pongas texto fuera del JSON.
 
-Estructura exacta:
+Devuelve EXACTAMENTE esta estructura:
 {
   "title": "string",
   "hook": "string",
@@ -117,12 +119,20 @@ Reglas:
 - Plataforma: ${platform}
 - Duración objetivo: ${duration} segundos.
 - Nicho: ${nicheMap[niche] || niche}
-- Si el contenido se basa en una noticia o caso real, redacta de forma responsable y narrativa.
-- No inventes fuentes ni detalles específicos no dados.
+- Si el contenido es de casos reales o crimen, redacta con tono serio y responsable.
+- No inventes medios ni detalles específicos no dados.
 `;
 }
 
-async function generateScriptFromStory({ niche, platform, duration, topic, sourceTitle, sourceDescription, sourceUrl }) {
+async function generateScriptFromStory({
+  niche,
+  platform,
+  duration,
+  topic,
+  sourceTitle,
+  sourceDescription,
+  sourceUrl
+}) {
   const response = await client.responses.create({
     model: "gpt-5.4",
     input: [
@@ -153,7 +163,10 @@ Hazlo ideal para ${platform} y ${duration} segundos.
   });
 
   const text = (response.output_text || "").trim();
-  if (!text) throw new Error("La IA devolvió respuesta vacía");
+
+  if (!text) {
+    throw new Error("La IA devolvió respuesta vacía");
+  }
 
   try {
     return JSON.parse(text);
@@ -163,7 +176,9 @@ Hazlo ideal para ${platform} y ${duration} segundos.
 }
 
 async function searchStoriesByNiche(niche, maxResults = 8) {
-  if (!GNEWS_API_KEY) throw new Error("Falta GNEWS_API_KEY");
+  if (!GNEWS_API_KEY) {
+    throw new Error("Falta GNEWS_API_KEY");
+  }
 
   const queries = nicheQueries[niche] || nicheQueries.misterio;
   const allArticles = [];
@@ -179,7 +194,9 @@ async function searchStoriesByNiche(niche, maxResults = 8) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data?.errors?.join(", ") || data?.message || "Error consultando GNews");
+      throw new Error(
+        data?.errors?.join(", ") || data?.message || "Error consultando GNews"
+      );
     }
 
     for (const article of data.articles || []) {
@@ -194,23 +211,31 @@ async function searchStoriesByNiche(niche, maxResults = 8) {
     const key = (article.url || article.title || "").trim();
     if (!key || seen.has(key)) continue;
     seen.add(key);
-    deduped.push(article);
+
+    deduped.push({
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      source: article.source?.name || "",
+      publishedAt: article.publishedAt || "",
+      image: article.image || ""
+    });
   }
 
-  return deduped.slice(0, maxResults).map((article) => ({
-    title: article.title,
-    description: article.description,
-    url: article.url,
-    source: article.source?.name || "",
-    publishedAt: article.publishedAt || "",
-    image: article.image || ""
-  }));
+  return deduped.slice(0, maxResults);
 }
 
 app.post("/login", (req, res) => {
   const { password } = req.body || {};
-  if (password === PASSWORD) return res.json({ ok: true });
-  return res.status(401).json({ ok: false, error: "Contraseña incorrecta" });
+
+  if (password === PASSWORD) {
+    return res.json({ ok: true });
+  }
+
+  return res.status(401).json({
+    ok: false,
+    error: "Contraseña incorrecta"
+  });
 });
 
 app.post("/search-stories", async (req, res) => {
@@ -218,7 +243,10 @@ app.post("/search-stories", async (req, res) => {
     const { niche } = req.body || {};
 
     if (!niche) {
-      return res.status(400).json({ ok: false, error: "Falta niche" });
+      return res.status(400).json({
+        ok: false,
+        error: "Falta niche"
+      });
     }
 
     const stories = await searchStoriesByNiche(niche, 10);
@@ -230,6 +258,7 @@ app.post("/search-stories", async (req, res) => {
     });
   } catch (error) {
     console.error("ERROR /search-stories:", error);
+
     return res.status(500).json({
       ok: false,
       error: "Error buscando historias",
@@ -240,17 +269,7 @@ app.post("/search-stories", async (req, res) => {
 
 app.post("/generate", async (req, res) => {
   try {
-    const { niche, platform, duration, topic, sourceTitle, sourceDescription, sourceUrl } = req.body || {};
-
-    if (!OPENAI_API_KEY) {
-      return res.status(500).json({ ok: false, error: "Falta OPENAI_API_KEY" });
-    }
-
-    if (!niche || !platform || !duration || !topic) {
-      return res.status(400).json({ ok: false, error: "Faltan datos para generar contenido" });
-    }
-
-    const data = await generateScriptFromStory({
+    const {
       niche,
       platform,
       duration,
@@ -258,11 +277,63 @@ app.post("/generate", async (req, res) => {
       sourceTitle,
       sourceDescription,
       sourceUrl
+    } = req.body || {};
+
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({
+        ok: false,
+        error: "Falta OPENAI_API_KEY"
+      });
+    }
+
+    if (!niche || !platform || !duration) {
+      return res.status(400).json({
+        ok: false,
+        error: "Faltan datos para generar contenido"
+      });
+    }
+
+    let finalTopic = topic;
+    let finalSourceTitle = sourceTitle;
+    let finalSourceDescription = sourceDescription;
+    let finalSourceUrl = sourceUrl;
+
+    // Modo automático real: si no escribes tema, busca una historia solo
+    if (!finalTopic || finalTopic.trim() === "") {
+      const stories = await searchStoriesByNiche(niche, 1);
+
+      if (!stories.length) {
+        return res.status(404).json({
+          ok: false,
+          error: "No se encontraron historias automáticas"
+        });
+      }
+
+      const story = stories[0];
+      finalTopic = story.title;
+      finalSourceTitle = story.title;
+      finalSourceDescription = story.description;
+      finalSourceUrl = story.url;
+    }
+
+    const data = await generateScriptFromStory({
+      niche,
+      platform,
+      duration,
+      topic: finalTopic,
+      sourceTitle: finalSourceTitle,
+      sourceDescription: finalSourceDescription,
+      sourceUrl: finalSourceUrl
     });
 
-    return res.json({ ok: true, data });
+    return res.json({
+      ok: true,
+      data,
+      sourceUrl: finalSourceUrl || ""
+    });
   } catch (error) {
     console.error("ERROR /generate:", error);
+
     return res.status(500).json({
       ok: false,
       error: "Error generando contenido",
@@ -276,7 +347,10 @@ app.post("/generate-daily-pack", async (req, res) => {
     const { platform = "TikTok", duration = "60" } = req.body || {};
 
     if (!OPENAI_API_KEY) {
-      return res.status(500).json({ ok: false, error: "Falta OPENAI_API_KEY" });
+      return res.status(500).json({
+        ok: false,
+        error: "Falta OPENAI_API_KEY"
+      });
     }
 
     const targetNiches = [
@@ -325,6 +399,7 @@ app.post("/generate-daily-pack", async (req, res) => {
     });
   } catch (error) {
     console.error("ERROR /generate-daily-pack:", error);
+
     return res.status(500).json({
       ok: false,
       error: "Error generando pack diario",
