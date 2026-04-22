@@ -7,27 +7,29 @@
   <link rel="manifest" href="/manifest.json" />
   <style>
     :root{
-      --bg:#070b12;
-      --panel:#111827;
-      --panel-2:#182231;
+      --bg:#060914;
+      --panel:#101826;
+      --panel-2:#162234;
       --line:#253246;
-      --text:#edf2f7;
-      --muted:#95a3b8;
-      --accent:#7c3aed;
+      --text:#eef4ff;
+      --muted:#94a3b8;
+      --accent:#8b5cf6;
       --accent-2:#06b6d4;
       --good:#22c55e;
       --warn:#f59e0b;
       --danger:#ef4444;
-      --card:#0f1724;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
-      --radius:20px;
+      --card:#0b1220;
+      --shadow:0 24px 70px rgba(0,0,0,.35);
+      --radius:24px;
     }
 
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:
-      radial-gradient(circle at top left, rgba(124,58,237,.15), transparent 26%),
-      radial-gradient(circle at top right, rgba(6,182,212,.12), transparent 24%),
-      var(--bg);
+    html,body{
+      margin:0;padding:0;
+      background:
+        radial-gradient(circle at top left, rgba(139,92,246,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(6,182,212,.14), transparent 25%),
+        var(--bg);
       color:var(--text);
       font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -35,21 +37,21 @@
     body{min-height:100vh}
 
     .app-shell{
-      width:min(1320px, calc(100% - 32px));
-      margin:24px auto;
+      width:min(1400px, calc(100% - 28px));
+      margin:20px auto;
       display:grid;
-      grid-template-columns:280px 1fr;
+      grid-template-columns:300px 1fr;
       gap:20px;
     }
 
     .sidebar{
-      background:linear-gradient(180deg, rgba(17,24,39,.95), rgba(10,16,25,.95));
+      background:linear-gradient(180deg, rgba(16,24,38,.98), rgba(10,15,24,.96));
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:30px;
       padding:22px;
       box-shadow:var(--shadow);
       position:sticky;
-      top:24px;
+      top:20px;
       height:fit-content;
     }
 
@@ -61,16 +63,16 @@
     }
 
     .logo{
-      width:48px;
-      height:48px;
-      border-radius:16px;
+      width:52px;
+      height:52px;
+      border-radius:18px;
       background:linear-gradient(135deg, var(--accent), var(--accent-2));
       display:grid;
       place-items:center;
-      color:#fff;
-      font-weight:800;
-      font-size:20px;
-      box-shadow:0 10px 30px rgba(124,58,237,.35);
+      color:white;
+      font-weight:900;
+      font-size:22px;
+      box-shadow:0 12px 35px rgba(139,92,246,.35);
     }
 
     .brand h1{
@@ -89,7 +91,7 @@
       display:flex;
       flex-direction:column;
       gap:10px;
-      margin-top:12px;
+      margin-bottom:20px;
     }
 
     .menu button{
@@ -103,7 +105,7 @@
       cursor:pointer;
       transition:.2s ease;
       font-size:14px;
-      font-weight:600;
+      font-weight:700;
     }
 
     .menu button:hover{
@@ -112,15 +114,15 @@
     }
 
     .menu button.active{
-      background:linear-gradient(135deg, rgba(124,58,237,.18), rgba(6,182,212,.12));
-      border-color:rgba(124,58,237,.4);
+      background:linear-gradient(135deg, rgba(139,92,246,.18), rgba(6,182,212,.12));
+      border-color:rgba(139,92,246,.35);
     }
 
     .side-card{
-      margin-top:22px;
+      margin-top:18px;
       background:rgba(255,255,255,.03);
       border:1px solid var(--line);
-      border-radius:20px;
+      border-radius:22px;
       padding:16px;
     }
 
@@ -133,7 +135,7 @@
       margin:0;
       color:var(--muted);
       font-size:13px;
-      line-height:1.6;
+      line-height:1.65;
     }
 
     .main{
@@ -144,38 +146,33 @@
 
     .hero{
       background:
-        linear-gradient(135deg, rgba(124,58,237,.16), rgba(6,182,212,.12)),
+        linear-gradient(135deg, rgba(139,92,246,.16), rgba(6,182,212,.12)),
         var(--panel);
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:30px;
       padding:28px;
       box-shadow:var(--shadow);
     }
 
     .hero h2{
-      margin:0 0 8px;
-      font-size:32px;
+      margin:0 0 10px;
+      font-size:34px;
       line-height:1.05;
     }
 
     .hero p{
       margin:0;
+      max-width:920px;
       color:var(--muted);
-      max-width:800px;
-      line-height:1.7;
+      line-height:1.75;
     }
 
-    .tab{
-      display:none;
-    }
-
-    .tab.active{
-      display:block;
-    }
+    .tab{display:none}
+    .tab.active{display:block}
 
     .grid{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1.1fr .9fr;
       gap:20px;
     }
 
@@ -201,7 +198,7 @@
       margin-bottom:8px;
       font-size:13px;
       color:var(--muted);
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.2px;
     }
 
@@ -220,13 +217,13 @@
       cursor:pointer;
       transition:.2s ease;
       font-size:14px;
-      font-weight:600;
+      font-weight:700;
     }
 
     .chip:hover{transform:translateY(-1px)}
     .chip.active{
-      border-color:rgba(124,58,237,.5);
-      background:linear-gradient(135deg, rgba(124,58,237,.22), rgba(6,182,212,.1));
+      border-color:rgba(139,92,246,.45);
+      background:linear-gradient(135deg, rgba(139,92,246,.22), rgba(6,182,212,.1));
     }
 
     select, textarea, input{
@@ -241,9 +238,9 @@
     }
 
     textarea{
-      min-height:140px;
+      min-height:130px;
       resize:vertical;
-      line-height:1.6;
+      line-height:1.7;
     }
 
     .row{
@@ -254,8 +251,8 @@
 
     .actions{
       display:flex;
-      gap:12px;
       flex-wrap:wrap;
+      gap:12px;
     }
 
     .btn{
@@ -269,12 +266,10 @@
     }
 
     .btn-primary{
-      background:linear-gradient(135deg, var(--accent), #5b21b6);
-      color:#fff;
-      box-shadow:0 12px 30px rgba(124,58,237,.35);
+      background:linear-gradient(135deg, var(--accent), #6d28d9);
+      color:white;
+      box-shadow:0 12px 30px rgba(139,92,246,.35);
     }
-
-    .btn-primary:hover{transform:translateY(-1px)}
 
     .btn-secondary{
       background:var(--panel-2);
@@ -285,8 +280,10 @@
     .btn-danger{
       background:rgba(239,68,68,.1);
       color:#fecaca;
-      border:1px solid rgba(239,68,68,.25);
+      border:1px solid rgba(239,68,68,.22);
     }
+
+    .btn:hover{transform:translateY(-1px)}
 
     .result-card{
       background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);
@@ -297,7 +294,7 @@
     }
 
     .result-title{
-      font-size:22px;
+      font-size:24px;
       margin:0 0 14px;
     }
 
@@ -327,7 +324,7 @@
       color:var(--muted);
       margin-bottom:8px;
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
       text-transform:uppercase;
       letter-spacing:.12em;
     }
@@ -338,7 +335,7 @@
       border-radius:18px;
       padding:14px 16px;
       white-space:pre-wrap;
-      line-height:1.7;
+      line-height:1.75;
     }
 
     .hashtags{
@@ -349,9 +346,9 @@
 
     .hashtags span{
       font-size:13px;
-      color:#c4b5fd;
-      background:rgba(124,58,237,.14);
-      border:1px solid rgba(124,58,237,.26);
+      color:#ddd6fe;
+      background:rgba(139,92,246,.14);
+      border:1px solid rgba(139,92,246,.26);
       padding:8px 10px;
       border-radius:999px;
     }
@@ -367,7 +364,7 @@
       cursor:pointer;
       list-style:none;
       padding:16px 18px;
-      font-weight:800;
+      font-weight:900;
       background:rgba(255,255,255,.03);
     }
 
@@ -383,7 +380,7 @@
 
     .step-title{
       font-size:13px;
-      font-weight:800;
+      font-weight:900;
       color:#93c5fd;
       margin-bottom:6px;
       text-transform:uppercase;
@@ -405,6 +402,15 @@
       background:rgba(255,255,255,.02);
     }
 
+    .calendar-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
     .calendar-wrap{
       display:grid;
       grid-template-columns:repeat(7,1fr);
@@ -414,7 +420,7 @@
     .calendar-head{
       color:var(--muted);
       font-size:12px;
-      font-weight:800;
+      font-weight:900;
       text-align:center;
       padding:8px 0;
       text-transform:uppercase;
@@ -434,7 +440,7 @@
     .calendar-num{
       font-size:13px;
       color:var(--muted);
-      font-weight:700;
+      font-weight:800;
     }
 
     .cal-item{
@@ -444,8 +450,17 @@
       line-height:1.4;
     }
 
-    .scheduled{background:rgba(245,158,11,.14); color:#fde68a; border:1px solid rgba(245,158,11,.22);}
-    .published{background:rgba(34,197,94,.14); color:#bbf7d0; border:1px solid rgba(34,197,94,.22);}
+    .scheduled{
+      background:rgba(245,158,11,.14);
+      color:#fde68a;
+      border:1px solid rgba(245,158,11,.22);
+    }
+
+    .published{
+      background:rgba(34,197,94,.14);
+      color:#bbf7d0;
+      border:1px solid rgba(34,197,94,.22);
+    }
 
     table{
       width:100%;
@@ -493,10 +508,15 @@
       font-size:13px;
     }
 
+    .status-select, .views-input{
+      width:100%;
+      min-width:120px;
+    }
+
     .login-overlay{
       position:fixed;
       inset:0;
-      background:rgba(4,8,15,.82);
+      background:rgba(4,8,15,.84);
       backdrop-filter:blur(14px);
       display:flex;
       align-items:center;
@@ -506,7 +526,7 @@
     }
 
     .login-card{
-      width:min(420px, 100%);
+      width:min(430px, 100%);
       background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(10,16,25,.98));
       border:1px solid var(--line);
       border-radius:30px;
@@ -540,7 +560,7 @@
       pointer-events:none;
       transition:.22s ease;
       z-index:120;
-      max-width:320px;
+      max-width:340px;
     }
 
     .toast.show{
@@ -549,26 +569,14 @@
     }
 
     @media (max-width: 1100px){
-      .app-shell{
-        grid-template-columns:1fr;
-      }
-
-      .sidebar{
-        position:relative;
-        top:0;
-      }
-
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      .stat-grid{
-        grid-template-columns:repeat(2,1fr);
-      }
+      .app-shell{grid-template-columns:1fr}
+      .sidebar{position:relative;top:0}
+      .grid{grid-template-columns:1fr}
+      .stat-grid{grid-template-columns:repeat(2,1fr)}
     }
 
-    @media (max-width: 640px){
-      .hero h2{font-size:24px}
+    @media (max-width: 700px){
+      .hero h2{font-size:25px}
       .row{grid-template-columns:1fr}
       .calendar-wrap{grid-template-columns:repeat(2,1fr)}
       .stat-grid{grid-template-columns:1fr}
@@ -580,7 +588,7 @@
     <div class="login-card">
       <div class="logo" style="margin-bottom:18px;">C</div>
       <h2>ContentBot Pro</h2>
-      <p>Generador de guiones virales, calendario editorial y tracker de videos. Entra con tu contraseña para usar tu panel.</p>
+      <p>Generador de guiones virales, pack diario, calendario editorial y tracker de videos con guía CapCut integrada.</p>
       <div class="field">
         <label>Contraseña</label>
         <input id="pass" type="password" placeholder="Escribe tu contraseña" />
@@ -595,7 +603,7 @@
         <div class="logo">C</div>
         <div>
           <h1>ContentBot Pro</h1>
-          <p>Faceless content system</p>
+          <p>viral faceless system</p>
         </div>
       </div>
 
@@ -607,19 +615,19 @@
 
       <div class="side-card">
         <h3>Flujo recomendado</h3>
-        <p>Bot → ElevenLabs → Pexels/Higgsfield → CapCut → subida manual. Esa es la forma más sólida para crecer sin depender de autoposting.</p>
+        <p>Bot → ElevenLabs → Pexels / Higgsfield → CapCut → subida manual. Esa ruta te da más control y mejor calidad.</p>
       </div>
 
       <div class="side-card">
-        <h3>Nichos activos</h3>
-        <p>Misterio / terror, curiosidades virales, motivación / éxito y drama / gossip de internet.</p>
+        <h3>Tipos de contenido</h3>
+        <p>Misterio, curiosidades, motivación, drama, historias reales inauditas, casos sin resolver, casos resueltos impactantes y crimen perturbador.</p>
       </div>
     </aside>
 
     <main class="main">
       <section class="hero">
-        <h2>Crea contenido viral con look profesional</h2>
-        <p>Genera guiones completos, guía de producción CapCut, ideas visuales, calendario de publicación y seguimiento de videos desde un solo panel.</p>
+        <h2>Crea historias virales con look premium</h2>
+        <p>Genera guiones completos, hashtags, notas visuales, guía CapCut, pack diario, calendario y seguimiento de rendimiento desde un solo panel profesional.</p>
       </section>
 
       <section id="tab-generator" class="tab active">
@@ -631,6 +639,10 @@
               <label>Nicho</label>
               <div class="chips" id="nicheChips">
                 <button class="chip active" data-value="misterio">🕵️ Misterio / Terror</button>
+                <button class="chip" data-value="historias_reales">📚 Historias reales inauditas</button>
+                <button class="chip" data-value="casos_sin_resolver">🧩 Casos sin resolver</button>
+                <button class="chip" data-value="casos_resueltos">⚖️ Casos resueltos impactantes</button>
+                <button class="chip" data-value="crimen_perturbador">🩸 Crimen perturbador</button>
                 <button class="chip" data-value="curiosidades">🤯 Curiosidades</button>
                 <button class="chip" data-value="motivacion">💪 Motivación / Éxito</button>
                 <button class="chip" data-value="drama">🍿 Drama / Gossip</button>
@@ -659,11 +671,12 @@
 
             <div class="field">
               <label>Tema / idea base</label>
-              <textarea id="topic" placeholder="Ejemplo: La historia real de un hotel donde desaparecieron huéspedes sin explicación..."></textarea>
+              <textarea id="topic" placeholder="Ejemplo: Un caso real tan extraño que durante años parecía una leyenda urbana..."></textarea>
             </div>
 
             <div class="actions">
               <button class="btn btn-primary" onclick="generateContent()">⚡ Generar contenido</button>
+              <button class="btn btn-secondary" onclick="generateDailyPack()">📦 Generar pack diario</button>
               <button class="btn btn-secondary" onclick="saveToCalendar()">📅 Enviar al calendario</button>
               <button class="btn btn-secondary" onclick="saveToTracker()">📊 Enviar al tracker</button>
               <button class="btn btn-danger" onclick="clearResult()">🗑️ Limpiar</button>
@@ -684,7 +697,10 @@
 
       <section id="tab-calendar" class="tab">
         <div class="panel">
-          <h3>Calendario de publicación</h3>
+          <div class="calendar-top">
+            <h3 style="margin:0;">Calendario de publicación</h3>
+            <div class="mini-note">Los elementos enviados desde el generador aparecen como programados.</div>
+          </div>
           <div class="calendar-wrap" id="calendarGrid"></div>
         </div>
       </section>
@@ -692,6 +708,7 @@
       <section id="tab-tracker" class="tab">
         <div class="panel">
           <h3>Tracker de videos</h3>
+
           <div class="stat-grid">
             <div class="stat">
               <strong id="statTotal">0</strong>
@@ -739,6 +756,7 @@
   <script>
     let selectedNiche = "misterio";
     let latestGenerated = null;
+    let latestDailyPack = [];
 
     const historyItems = JSON.parse(localStorage.getItem("cb_history") || "[]");
     const trackerItems = JSON.parse(localStorage.getItem("cb_tracker") || "[]");
@@ -850,8 +868,79 @@
       }
     }
 
+    async function generateDailyPack(){
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerHTML = '<div class="empty">Generando pack diario...</div>';
+
+      try {
+        const r = await fetch("/generate-daily-pack", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"}
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+          resultBox.innerHTML = `
+            <div class="result-card">
+              <div class="section">
+                <small>Error</small>
+                <div class="section-content">${JSON.stringify(data, null, 2)}</div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        latestDailyPack = data.results || [];
+
+        resultBox.innerHTML = `
+          <div class="result-card">
+            <h2 class="result-title">Pack diario generado</h2>
+            <div class="meta">
+              <span class="tag">${new Date(data.date).toLocaleDateString()}</span>
+              <span class="tag">${latestDailyPack.length} piezas</span>
+            </div>
+
+            ${latestDailyPack.map((item, idx) => {
+              if(item.error){
+                return `
+                  <div class="section">
+                    <small>${idx + 1}. ${item.niche}</small>
+                    <div class="section-content">Error: ${item.error}</div>
+                  </div>
+                `;
+              }
+
+              return `
+                <div class="section">
+                  <small>${idx + 1}. ${item.niche}</small>
+                  <div class="section-content"><strong>${item.data.title}</strong>\n\n${item.data.hook}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+
+        showToast("Pack diario generado");
+      } catch (err) {
+        resultBox.innerHTML = `
+          <div class="result-card">
+            <div class="section">
+              <small>Error</small>
+              <div class="section-content">${err.message}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
     function renderResult(item){
       const box = document.getElementById("resultBox");
+
+      const hashtagsText = (item.hashtags || []).map(tag => `#${tag}`).join(" ");
+      const fullScript = `TÍTULO:\n${item.title}\n\nHOOK:\n${item.hook}\n\nDESARROLLO:\n${item.development}\n\nCTA:\n${item.cta}\n\nHASHTAGS:\n${hashtagsText}\n\nNOTAS VISUALES:\n${item.visual_notes}\n\nTIP DE ALGORITMO:\n${item.algorithm_tip}`;
+      const capcutText = `GUÍA CAPCUT\n\n1. VOZ:\n${item.capcut_guide?.voice || ""}\n\n2. IMÁGENES / CLIPS:\n${(item.capcut_guide?.images || []).join("\n")}\n\n3. EDICIÓN:\n${item.capcut_guide?.editing || ""}\n\n4. TEXTO EN PANTALLA:\n${item.capcut_guide?.screen_text || ""}\n\n5. MÚSICA:\n${item.capcut_guide?.music || ""}\n\n6. EXPORTAR:\n${item.capcut_guide?.export || ""}`;
 
       box.innerHTML = `
         <div class="result-card">
@@ -861,6 +950,14 @@
             <span class="tag">${item.niche}</span>
             <span class="tag">${item.platform}</span>
             <span class="tag">${item.duration}s</span>
+          </div>
+
+          <div class="actions" style="margin-bottom:18px;">
+            <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(item.hook)})'>📋 Copiar Hook</button>
+            <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(fullScript)})'>📝 Copiar Guion</button>
+            <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(hashtagsText)})'>#️⃣ Copiar Hashtags</button>
+            <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(capcutText)})'>🎬 Copiar CapCut</button>
+            <button class="btn btn-primary" onclick='exportTXT(${JSON.stringify(item.title)}, ${JSON.stringify(fullScript + "\\n\\n" + capcutText)})'>⬇️ Exportar TXT</button>
           </div>
 
           <div class="section">
@@ -935,6 +1032,7 @@
 
     function clearResult(){
       latestGenerated = null;
+      latestDailyPack = [];
       document.getElementById("resultBox").innerHTML =
         '<div class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>';
     }
@@ -947,8 +1045,8 @@
         topic: item.topic
       });
 
-      if(historyItems.length > 8){
-        historyItems.length = 8;
+      if(historyItems.length > 10){
+        historyItems.length = 10;
       }
 
       localStorage.setItem("cb_history", JSON.stringify(historyItems));
@@ -1068,15 +1166,58 @@
         return;
       }
 
-      body.innerHTML = trackerItems.map(item => `
+      body.innerHTML = trackerItems.map((item, index) => `
         <tr>
           <td>${item.title}</td>
           <td>${item.niche}</td>
           <td>${item.platform}</td>
-          <td>${item.status}</td>
-          <td>${item.views}</td>
+          <td>
+            <select class="status-select" onchange="updateStatus(${index}, this.value)">
+              <option value="Borrador" ${item.status === "Borrador" ? "selected" : ""}>Borrador</option>
+              <option value="Listo" ${item.status === "Listo" ? "selected" : ""}>Listo</option>
+              <option value="Publicado" ${item.status === "Publicado" ? "selected" : ""}>Publicado</option>
+            </select>
+          </td>
+          <td>
+            <input class="views-input" type="number" value="${item.views}" min="0" onchange="updateViews(${index}, this.value)" />
+          </td>
         </tr>
       `).join("");
+    }
+
+    function updateStatus(index, value){
+      trackerItems[index].status = value;
+      localStorage.setItem("cb_tracker", JSON.stringify(trackerItems));
+      renderTracker();
+      showToast("Estado actualizado");
+    }
+
+    function updateViews(index, value){
+      trackerItems[index].views = Number(value || 0);
+      localStorage.setItem("cb_tracker", JSON.stringify(trackerItems));
+      renderTracker();
+    }
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast("Copiado");
+      }catch{
+        showToast("No se pudo copiar");
+      }
+    }
+
+    function exportTXT(title, content){
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${title.replace(/[^\w\s-]/g, "").replace(/\s+/g, "_")}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("TXT exportado");
     }
 
     renderHistory();
