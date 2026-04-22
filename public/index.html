@@ -147,7 +147,7 @@
     }
     .toast.show{opacity:1;transform:translateY(0)}
     .story-card h4{margin:0 0 10px;font-size:16px}
-    .story-card a{color:#93c5fd}
+    .story-card a{color:#93c5fd;text-decoration:none}
     @media (max-width:1100px){
       .app-shell{grid-template-columns:1fr}
       .sidebar{position:relative;top:0}
@@ -181,7 +181,7 @@
         <div class="logo">C</div>
         <div>
           <h1>ContentBot Pro</h1>
-          <p>auto viral research system</p>
+          <p>auto viral story system</p>
         </div>
       </div>
 
@@ -193,7 +193,7 @@
 
       <div class="side-card">
         <h3>Modo automático</h3>
-        <p>Busca historias virales reales, elige una y conviértela en guion sin tener que escribir el tema manualmente.</p>
+        <p>Si no escribes tema, el bot busca una historia viral real por ti y genera el guion completo automáticamente.</p>
       </div>
 
       <div class="side-card">
@@ -204,8 +204,8 @@
 
     <main class="main">
       <section class="hero">
-        <h2>Busca historias virales y conviértelas en contenido listo</h2>
-        <p>Tu bot investiga historias actuales, te propone opciones y las transforma en guiones virales con hashtags, notas visuales y guía de producción CapCut.</p>
+        <h2>Genera historias automáticas sin escribir tema</h2>
+        <p>Puedes buscar historias reales virales, generar un guion desde una fuente concreta o dejar el campo vacío para que el bot haga todo solo.</p>
       </section>
 
       <section id="tab-generator" class="tab active">
@@ -248,12 +248,12 @@
 
             <div class="field">
               <label>Tema manual (opcional)</label>
-              <textarea id="topic" placeholder="Déjalo vacío si quieres que el bot lo busque por ti."></textarea>
+              <textarea id="topic" placeholder="Déjalo vacío si quieres que el bot genere una historia solo."></textarea>
             </div>
 
             <div class="actions">
               <button class="btn btn-primary" onclick="searchStories()">🔎 Buscar historias virales</button>
-              <button class="btn btn-secondary" onclick="generateFromManual()">✍️ Generar desde tema manual</button>
+              <button class="btn btn-secondary" onclick="generateAutomatic()">⚡ Generar historia automática</button>
               <button class="btn btn-secondary" onclick="generateDailyPack()">📦 Generar pack diario</button>
               <button class="btn btn-danger" onclick="clearResult()">🗑️ Limpiar</button>
             </div>
@@ -453,20 +453,67 @@
       }
     }
 
-    async function generateFromManual(){
+    async function generateAutomatic(){
       const topic = document.getElementById("topic").value.trim();
       const platform = document.getElementById("platform").value;
       const duration = document.getElementById("duration").value;
-
-      if(!topic){
-        showToast("Escribe un tema o usa Buscar historias");
-        return;
-      }
-
       const resultBox = document.getElementById("resultBox");
       resultBox.innerHTML = '<div class="empty">Generando contenido...</div>';
 
       try{
+        if(!topic){
+          const searchRes = await fetch("/search-stories", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ niche: selectedNiche })
+          });
+
+          const searchData = await searchRes.json();
+
+          if(!searchData.ok || !searchData.stories || !searchData.stories.length){
+            resultBox.innerHTML = `<div class="result-card"><div class="section-content">No se encontraron historias automáticas.</div></div>`;
+            return;
+          }
+
+          foundStories = searchData.stories;
+          const story = searchData.stories[0];
+
+          const genRes = await fetch("/generate", {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+              niche: selectedNiche,
+              platform,
+              duration,
+              topic: story.title,
+              sourceTitle: story.title,
+              sourceDescription: story.description,
+              sourceUrl: story.url
+            })
+          });
+
+          const genData = await genRes.json();
+
+          if(!genData.ok){
+            resultBox.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(genData, null, 2)}</div></div>`;
+            return;
+          }
+
+          latestGenerated = {
+            ...genData.data,
+            niche: selectedNiche,
+            platform,
+            duration,
+            topic: story.title,
+            sourceUrl: story.url
+          };
+
+          renderResult(latestGenerated);
+          renderAutoStoriesPreview();
+          showToast("Historia automática generada");
+          return;
+        }
+
         const r = await fetch("/generate", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
@@ -498,6 +545,22 @@
       }catch(err){
         resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
       }
+    }
+
+    function renderAutoStoriesPreview(){
+      const box = document.getElementById("storiesBox");
+      if(!foundStories.length) return;
+
+      box.innerHTML = foundStories.slice(0, 5).map((story, index) => `
+        <div class="story-card">
+          <h4>${story.title}</h4>
+          <div class="mini-note">${story.source || "Fuente desconocida"}</div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn btn-secondary" onclick="generateFromStory(${index})">Usar esta</button>
+            <a class="btn btn-secondary" href="${story.url}" target="_blank" rel="noopener noreferrer">Fuente</a>
+          </div>
+        </div>
+      `).join("");
     }
 
     async function generateDailyPack(){
@@ -544,7 +607,6 @@
             }).join("")}
           </div>
         `;
-
         showToast("Pack diario generado");
       }catch(err){
         resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
@@ -603,9 +665,9 @@
     function clearResult(){
       latestGenerated = null;
       latestDailyPack = [];
+      foundStories = [];
       document.getElementById("resultBox").innerHTML = '<div class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>';
       document.getElementById("storiesBox").innerHTML = '<div class="empty">Busca historias y aquí verás opciones reales para convertir en guion.</div>';
-      foundStories = [];
     }
 
     function saveToTracker(){
