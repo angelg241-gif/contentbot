@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ContentBot Pro</title>
-  <link rel="manifest" href="/manifest.json" />
   <style>
     :root{
       --bg:#060914;
@@ -15,27 +14,19 @@
       --muted:#94a3b8;
       --accent:#8b5cf6;
       --accent-2:#06b6d4;
-      --good:#22c55e;
-      --warn:#f59e0b;
-      --danger:#ef4444;
       --card:#0b1220;
       --shadow:0 24px 70px rgba(0,0,0,.35);
-      --radius:24px;
     }
-
     *{box-sizing:border-box}
-    html,body{
-      margin:0;padding:0;
+    body{
+      margin:0;
       background:
         radial-gradient(circle at top left, rgba(139,92,246,.18), transparent 28%),
         radial-gradient(circle at top right, rgba(6,182,212,.14), transparent 25%),
         var(--bg);
       color:var(--text);
-      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family:Inter,system-ui,sans-serif;
     }
-
-    body{min-height:100vh}
-
     .app-shell{
       width:min(1400px, calc(100% - 28px));
       margin:20px auto;
@@ -43,540 +34,127 @@
       grid-template-columns:300px 1fr;
       gap:20px;
     }
-
-    .sidebar{
-      background:linear-gradient(180deg, rgba(16,24,38,.98), rgba(10,15,24,.96));
+    .sidebar,.panel,.hero,.login-card{
+      background:linear-gradient(180deg, rgba(16,24,38,.98), rgba(10,16,25,.96));
       border:1px solid var(--line);
-      border-radius:30px;
-      padding:22px;
       box-shadow:var(--shadow);
-      position:sticky;
-      top:20px;
-      height:fit-content;
     }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      margin-bottom:28px;
+    .sidebar{
+      border-radius:30px;padding:22px;position:sticky;top:20px;height:fit-content;
     }
-
+    .panel,.hero{border-radius:28px;padding:22px}
+    .hero{padding:28px}
+    .brand{display:flex;gap:14px;align-items:center;margin-bottom:28px}
     .logo{
-      width:52px;
-      height:52px;
-      border-radius:18px;
-      background:linear-gradient(135deg, var(--accent), var(--accent-2));
-      display:grid;
-      place-items:center;
-      color:white;
-      font-weight:900;
-      font-size:22px;
-      box-shadow:0 12px 35px rgba(139,92,246,.35);
+      width:52px;height:52px;border-radius:18px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;font-weight:900;font-size:22px;
     }
-
-    .brand h1{
-      margin:0;
-      font-size:20px;
-      line-height:1;
+    .brand h1{margin:0;font-size:20px}
+    .brand p,.mini-note,.field label,.hero p,.side-card p,.empty,.meta .tag{color:var(--muted)}
+    .brand p,.side-card p,.hero p,.mini-note,.empty{line-height:1.7}
+    .menu{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+    .menu button,.chip,.btn{
+      cursor:pointer;border-radius:16px;font-size:14px;font-weight:800;transition:.2s ease;
     }
-
-    .brand p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .menu{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:20px;
-    }
-
     .menu button{
-      width:100%;
-      background:transparent;
-      color:var(--text);
-      border:1px solid transparent;
-      border-radius:16px;
-      padding:14px 16px;
-      text-align:left;
-      cursor:pointer;
-      transition:.2s ease;
-      font-size:14px;
-      font-weight:700;
+      width:100%;padding:14px 16px;text-align:left;border:1px solid transparent;background:transparent;color:var(--text)
     }
-
-    .menu button:hover{
-      background:rgba(255,255,255,.03);
-      border-color:var(--line);
-    }
-
-    .menu button.active{
-      background:linear-gradient(135deg, rgba(139,92,246,.18), rgba(6,182,212,.12));
+    .menu button.active,.chip.active{
+      background:linear-gradient(135deg, rgba(139,92,246,.22), rgba(6,182,212,.12));
       border-color:rgba(139,92,246,.35);
     }
-
     .side-card{
-      margin-top:18px;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:16px;
+      margin-top:18px;background:rgba(255,255,255,.03);border:1px solid var(--line);
+      border-radius:22px;padding:16px;
     }
-
-    .side-card h3{
-      margin:0 0 10px;
-      font-size:14px;
-    }
-
-    .side-card p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.65;
-    }
-
-    .main{
-      display:flex;
-      flex-direction:column;
-      gap:20px;
-    }
-
-    .hero{
-      background:
-        linear-gradient(135deg, rgba(139,92,246,.16), rgba(6,182,212,.12)),
-        var(--panel);
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero h2{
-      margin:0 0 10px;
-      font-size:34px;
-      line-height:1.05;
-    }
-
-    .hero p{
-      margin:0;
-      max-width:920px;
-      color:var(--muted);
-      line-height:1.75;
-    }
-
+    .side-card h3,.panel h3{margin:0 0 10px}
+    .main{display:flex;flex-direction:column;gap:20px}
+    .hero h2{margin:0 0 10px;font-size:34px}
     .tab{display:none}
     .tab.active{display:block}
-
-    .grid{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:20px;
-    }
-
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:28px;
-      padding:22px;
-      box-shadow:var(--shadow);
-    }
-
-    .panel h3{
-      margin:0 0 18px;
-      font-size:18px;
-    }
-
-    .field{
-      margin-bottom:18px;
-    }
-
-    .field label{
-      display:block;
-      margin-bottom:8px;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    .field{margin-bottom:18px}
+    .field label{display:block;margin-bottom:8px;font-size:13px;font-weight:800}
+    .chips,.actions,.story-list{display:flex;flex-wrap:wrap;gap:10px}
     .chip{
-      border:1px solid var(--line);
-      background:var(--panel-2);
-      color:var(--text);
+      border:1px solid var(--line);background:var(--panel-2);color:var(--text);
       padding:12px 14px;
-      border-radius:14px;
-      cursor:pointer;
-      transition:.2s ease;
-      font-size:14px;
-      font-weight:700;
     }
-
-    .chip:hover{transform:translateY(-1px)}
-    .chip.active{
-      border-color:rgba(139,92,246,.45);
-      background:linear-gradient(135deg, rgba(139,92,246,.22), rgba(6,182,212,.1));
+    select,textarea,input{
+      width:100%;background:#0b1220;color:var(--text);border:1px solid var(--line);
+      border-radius:16px;padding:14px 16px;font-size:14px;outline:none;
     }
-
-    select, textarea, input{
-      width:100%;
-      background:#0b1220;
-      color:var(--text);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:14px 16px;
-      font-size:14px;
-      outline:none;
-    }
-
-    textarea{
-      min-height:130px;
-      resize:vertical;
-      line-height:1.7;
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-    }
-
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-    }
-
-    .btn{
-      border:none;
-      cursor:pointer;
-      border-radius:16px;
-      padding:14px 18px;
-      font-size:14px;
-      font-weight:800;
-      transition:.2s ease;
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg, var(--accent), #6d28d9);
-      color:white;
-      box-shadow:0 12px 30px rgba(139,92,246,.35);
-    }
-
-    .btn-secondary{
-      background:var(--panel-2);
-      color:var(--text);
-      border:1px solid var(--line);
-    }
-
-    .btn-danger{
-      background:rgba(239,68,68,.1);
-      color:#fecaca;
-      border:1px solid rgba(239,68,68,.22);
-    }
-
-    .btn:hover{transform:translateY(-1px)}
-
-    .result-card{
+    textarea{min-height:120px;resize:vertical;line-height:1.7}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btn{border:none;padding:14px 18px}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff}
+    .btn-secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
+    .btn-danger{background:rgba(239,68,68,.1);color:#fecaca;border:1px solid rgba(239,68,68,.22)}
+    .result-card,.story-card{
       background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:20px;
-      margin-bottom:18px;
+      border:1px solid var(--line);border-radius:24px;padding:18px;margin-bottom:16px;
     }
-
-    .result-title{
-      font-size:24px;
-      margin:0 0 14px;
-    }
-
-    .meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:16px;
-    }
-
+    .result-title{font-size:24px;margin:0 0 14px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
     .tag{
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      background:rgba(255,255,255,.05);
-      border:1px solid var(--line);
-      color:var(--muted);
+      padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;
+      background:rgba(255,255,255,.05);border:1px solid var(--line)
     }
-
-    .section{
-      margin-bottom:16px;
-    }
-
+    .section{margin-bottom:16px}
     .section small{
-      display:block;
-      color:var(--muted);
-      margin-bottom:8px;
-      font-size:12px;
-      font-weight:900;
-      text-transform:uppercase;
-      letter-spacing:.12em;
+      display:block;margin-bottom:8px;font-size:12px;font-weight:900;text-transform:uppercase;
+      letter-spacing:.12em;color:var(--muted)
     }
-
     .section-content{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px 16px;
-      white-space:pre-wrap;
-      line-height:1.75;
+      background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:18px;
+      padding:14px 16px;white-space:pre-wrap;line-height:1.75;
     }
-
-    .hashtags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
+    .hashtags{display:flex;flex-wrap:wrap;gap:8px}
     .hashtags span{
-      font-size:13px;
-      color:#ddd6fe;
-      background:rgba(139,92,246,.14);
-      border:1px solid rgba(139,92,246,.26);
-      padding:8px 10px;
-      border-radius:999px;
+      font-size:13px;color:#ddd6fe;background:rgba(139,92,246,.14);
+      border:1px solid rgba(139,92,246,.26);padding:8px 10px;border-radius:999px;
     }
-
-    details{
-      border:1px solid var(--line);
-      border-radius:20px;
-      overflow:hidden;
-      background:rgba(255,255,255,.03);
-    }
-
-    summary{
-      cursor:pointer;
-      list-style:none;
-      padding:16px 18px;
-      font-weight:900;
-      background:rgba(255,255,255,.03);
-    }
-
-    summary::-webkit-details-marker{display:none}
-
-    .details-body{
-      padding:0 18px 18px;
-    }
-
-    .step{
-      margin-top:14px;
-    }
-
-    .step-title{
-      font-size:13px;
-      font-weight:900;
-      color:#93c5fd;
-      margin-bottom:6px;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .mini-note{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.7;
-    }
-
-    .empty{
-      color:var(--muted);
-      text-align:center;
-      padding:50px 20px;
-      border:1px dashed var(--line);
-      border-radius:24px;
-      background:rgba(255,255,255,.02);
-    }
-
-    .calendar-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:16px;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .calendar-wrap{
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:10px;
-    }
-
-    .calendar-head{
-      color:var(--muted);
-      font-size:12px;
-      font-weight:900;
-      text-align:center;
-      padding:8px 0;
-      text-transform:uppercase;
-    }
-
-    .calendar-day{
-      min-height:120px;
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:12px;
-      background:var(--card);
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .calendar-num{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .cal-item{
-      font-size:12px;
-      padding:8px;
-      border-radius:12px;
-      line-height:1.4;
-    }
-
-    .scheduled{
-      background:rgba(245,158,11,.14);
-      color:#fde68a;
-      border:1px solid rgba(245,158,11,.22);
-    }
-
-    .published{
-      background:rgba(34,197,94,.14);
-      color:#bbf7d0;
-      border:1px solid rgba(34,197,94,.22);
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      overflow:hidden;
-    }
-
-    th,td{
-      border-bottom:1px solid var(--line);
-      text-align:left;
-      padding:14px 10px;
-      vertical-align:top;
-      font-size:14px;
-    }
-
-    th{
-      color:var(--muted);
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-    }
-
-    .stat-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:14px;
-      margin-bottom:20px;
-    }
-
-    .stat{
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:18px;
-      background:var(--card);
-    }
-
-    .stat strong{
-      display:block;
-      font-size:28px;
-      margin-bottom:6px;
-    }
-
-    .stat span{
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .status-select, .views-input{
-      width:100%;
-      min-width:120px;
-    }
-
+    details{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:rgba(255,255,255,.03)}
+    summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:900;background:rgba(255,255,255,.03)}
+    .details-body{padding:0 18px 18px}
+    .step{margin-top:14px}
+    .step-title{font-size:13px;font-weight:900;color:#93c5fd;margin-bottom:6px;text-transform:uppercase}
+    .empty{text-align:center;padding:50px 20px;border:1px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.02)}
+    .calendar-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+    .calendar-head{text-align:center;font-size:12px;font-weight:900;padding:8px 0;color:var(--muted)}
+    .calendar-day{min-height:120px;border:1px solid var(--line);border-radius:18px;padding:12px;background:var(--card)}
+    .calendar-num{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:8px}
+    .cal-item{font-size:12px;padding:8px;border-radius:12px;line-height:1.4;margin-top:6px}
+    .scheduled{background:rgba(245,158,11,.14);color:#fde68a;border:1px solid rgba(245,158,11,.22)}
+    .published{background:rgba(34,197,94,.14);color:#bbf7d0;border:1px solid rgba(34,197,94,.22)}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--line);text-align:left;padding:14px 10px;font-size:14px}
+    th{color:var(--muted);font-size:12px;text-transform:uppercase}
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .stat{border:1px solid var(--line);border-radius:22px;padding:18px;background:var(--card)}
+    .stat strong{display:block;font-size:28px;margin-bottom:6px}
     .login-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(4,8,15,.84);
-      backdrop-filter:blur(14px);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:99;
-      padding:20px;
+      position:fixed;inset:0;background:rgba(4,8,15,.84);backdrop-filter:blur(14px);
+      display:flex;align-items:center;justify-content:center;z-index:99;padding:20px;
     }
-
-    .login-card{
-      width:min(430px, 100%);
-      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(10,16,25,.98));
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:28px;
-      box-shadow:var(--shadow);
-    }
-
-    .login-card h2{
-      margin:0 0 10px;
-      font-size:28px;
-    }
-
-    .login-card p{
-      margin:0 0 20px;
-      color:var(--muted);
-      line-height:1.7;
-    }
-
+    .login-card{width:min(430px,100%);border-radius:30px;padding:28px}
+    .login-card h2{margin:0 0 10px;font-size:28px}
     .toast{
-      position:fixed;
-      right:20px;
-      bottom:20px;
-      background:var(--panel);
-      border:1px solid var(--line);
-      color:var(--text);
-      padding:14px 16px;
-      border-radius:16px;
-      box-shadow:var(--shadow);
-      opacity:0;
-      transform:translateY(10px);
-      pointer-events:none;
-      transition:.22s ease;
-      z-index:120;
-      max-width:340px;
+      position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid var(--line);
+      color:var(--text);padding:14px 16px;border-radius:16px;box-shadow:var(--shadow);
+      opacity:0;transform:translateY(10px);pointer-events:none;transition:.22s ease;z-index:120;
     }
-
-    .toast.show{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-    @media (max-width: 1100px){
+    .toast.show{opacity:1;transform:translateY(0)}
+    .story-card h4{margin:0 0 10px;font-size:16px}
+    .story-card a{color:#93c5fd}
+    @media (max-width:1100px){
       .app-shell{grid-template-columns:1fr}
       .sidebar{position:relative;top:0}
       .grid{grid-template-columns:1fr}
       .stat-grid{grid-template-columns:repeat(2,1fr)}
     }
-
-    @media (max-width: 700px){
-      .hero h2{font-size:25px}
+    @media (max-width:700px){
       .row{grid-template-columns:1fr}
       .calendar-wrap{grid-template-columns:repeat(2,1fr)}
       .stat-grid{grid-template-columns:1fr}
@@ -588,7 +166,7 @@
     <div class="login-card">
       <div class="logo" style="margin-bottom:18px;">C</div>
       <h2>ContentBot Pro</h2>
-      <p>Generador de guiones virales, pack diario, calendario editorial y tracker de videos con guía CapCut integrada.</p>
+      <p class="mini-note">Historias virales automáticas, guiones, guía CapCut, calendario y tracker.</p>
       <div class="field">
         <label>Contraseña</label>
         <input id="pass" type="password" placeholder="Escribe tu contraseña" />
@@ -603,7 +181,7 @@
         <div class="logo">C</div>
         <div>
           <h1>ContentBot Pro</h1>
-          <p>viral faceless system</p>
+          <p>auto viral research system</p>
         </div>
       </div>
 
@@ -614,37 +192,37 @@
       </div>
 
       <div class="side-card">
-        <h3>Flujo recomendado</h3>
-        <p>Bot → ElevenLabs → Pexels / Higgsfield → CapCut → subida manual. Esa ruta te da más control y mejor calidad.</p>
+        <h3>Modo automático</h3>
+        <p>Busca historias virales reales, elige una y conviértela en guion sin tener que escribir el tema manualmente.</p>
       </div>
 
       <div class="side-card">
-        <h3>Tipos de contenido</h3>
-        <p>Misterio, curiosidades, motivación, drama, historias reales inauditas, casos sin resolver, casos resueltos impactantes y crimen perturbador.</p>
+        <h3>Nichos</h3>
+        <p>Historias reales, casos sin resolver, casos resueltos impactantes, crimen perturbador, misterio, curiosidades, motivación y drama.</p>
       </div>
     </aside>
 
     <main class="main">
       <section class="hero">
-        <h2>Crea historias virales con look premium</h2>
-        <p>Genera guiones completos, hashtags, notas visuales, guía CapCut, pack diario, calendario y seguimiento de rendimiento desde un solo panel profesional.</p>
+        <h2>Busca historias virales y conviértelas en contenido listo</h2>
+        <p>Tu bot investiga historias actuales, te propone opciones y las transforma en guiones virales con hashtags, notas visuales y guía de producción CapCut.</p>
       </section>
 
       <section id="tab-generator" class="tab active">
         <div class="grid">
           <div class="panel">
-            <h3>Generador de guiones virales</h3>
+            <h3>Descubrimiento + generación</h3>
 
             <div class="field">
               <label>Nicho</label>
               <div class="chips" id="nicheChips">
-                <button class="chip active" data-value="misterio">🕵️ Misterio / Terror</button>
-                <button class="chip" data-value="historias_reales">📚 Historias reales inauditas</button>
+                <button class="chip active" data-value="historias_reales">📚 Historias reales inauditas</button>
                 <button class="chip" data-value="casos_sin_resolver">🧩 Casos sin resolver</button>
                 <button class="chip" data-value="casos_resueltos">⚖️ Casos resueltos impactantes</button>
                 <button class="chip" data-value="crimen_perturbador">🩸 Crimen perturbador</button>
+                <button class="chip" data-value="misterio">🕵️ Misterio / Terror</button>
                 <button class="chip" data-value="curiosidades">🤯 Curiosidades</button>
-                <button class="chip" data-value="motivacion">💪 Motivación / Éxito</button>
+                <button class="chip" data-value="motivacion">💪 Motivación</button>
                 <button class="chip" data-value="drama">🍿 Drama / Gossip</button>
               </div>
             </div>
@@ -658,7 +236,6 @@
                   <option value="YouTube Shorts">YouTube Shorts</option>
                 </select>
               </div>
-
               <div class="field">
                 <label>Duración</label>
                 <select id="duration">
@@ -670,22 +247,21 @@
             </div>
 
             <div class="field">
-              <label>Tema / idea base</label>
-              <textarea id="topic" placeholder="Ejemplo: Un caso real tan extraño que durante años parecía una leyenda urbana..."></textarea>
+              <label>Tema manual (opcional)</label>
+              <textarea id="topic" placeholder="Déjalo vacío si quieres que el bot lo busque por ti."></textarea>
             </div>
 
             <div class="actions">
-              <button class="btn btn-primary" onclick="generateContent()">⚡ Generar contenido</button>
+              <button class="btn btn-primary" onclick="searchStories()">🔎 Buscar historias virales</button>
+              <button class="btn btn-secondary" onclick="generateFromManual()">✍️ Generar desde tema manual</button>
               <button class="btn btn-secondary" onclick="generateDailyPack()">📦 Generar pack diario</button>
-              <button class="btn btn-secondary" onclick="saveToCalendar()">📅 Enviar al calendario</button>
-              <button class="btn btn-secondary" onclick="saveToTracker()">📊 Enviar al tracker</button>
               <button class="btn btn-danger" onclick="clearResult()">🗑️ Limpiar</button>
             </div>
           </div>
 
           <div class="panel">
-            <h3>Historial rápido</h3>
-            <div id="historyBox" class="empty">Todavía no has generado contenido.</div>
+            <h3>Historias encontradas</h3>
+            <div id="storiesBox" class="empty">Busca historias y aquí verás opciones reales para convertir en guion.</div>
           </div>
         </div>
 
@@ -697,10 +273,7 @@
 
       <section id="tab-calendar" class="tab">
         <div class="panel">
-          <div class="calendar-top">
-            <h3 style="margin:0;">Calendario de publicación</h3>
-            <div class="mini-note">Los elementos enviados desde el generador aparecen como programados.</div>
-          </div>
+          <h3>Calendario de publicación</h3>
           <div class="calendar-wrap" id="calendarGrid"></div>
         </div>
       </section>
@@ -710,22 +283,10 @@
           <h3>Tracker de videos</h3>
 
           <div class="stat-grid">
-            <div class="stat">
-              <strong id="statTotal">0</strong>
-              <span>Total videos</span>
-            </div>
-            <div class="stat">
-              <strong id="statDraft">0</strong>
-              <span>Borradores</span>
-            </div>
-            <div class="stat">
-              <strong id="statPublished">0</strong>
-              <span>Publicados</span>
-            </div>
-            <div class="stat">
-              <strong id="statViews">0</strong>
-              <span>Vistas totales</span>
-            </div>
+            <div class="stat"><strong id="statTotal">0</strong><span>Total videos</span></div>
+            <div class="stat"><strong id="statDraft">0</strong><span>Borradores</span></div>
+            <div class="stat"><strong id="statPublished">0</strong><span>Publicados</span></div>
+            <div class="stat"><strong id="statViews">0</strong><span>Vistas totales</span></div>
           </div>
 
           <div style="overflow:auto;">
@@ -740,9 +301,7 @@
                 </tr>
               </thead>
               <tbody id="trackerTable">
-                <tr>
-                  <td colspan="5" class="mini-note">Todavía no hay videos registrados.</td>
-                </tr>
+                <tr><td colspan="5" class="mini-note">Todavía no hay videos registrados.</td></tr>
               </tbody>
             </table>
           </div>
@@ -754,11 +313,11 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    let selectedNiche = "misterio";
+    let selectedNiche = "historias_reales";
     let latestGenerated = null;
     let latestDailyPack = [];
+    let foundStories = [];
 
-    const historyItems = JSON.parse(localStorage.getItem("cb_history") || "[]");
     const trackerItems = JSON.parse(localStorage.getItem("cb_tracker") || "[]");
     const calendarItems = JSON.parse(localStorage.getItem("cb_calendar") || "[]");
 
@@ -771,7 +330,6 @@
 
     async function login(){
       const password = document.getElementById("pass").value;
-
       const r = await fetch("/login", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -797,28 +355,118 @@
     function switchTab(tabId, button){
       document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
       document.getElementById(`tab-${tabId}`).classList.add("active");
-
       document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
       button.classList.add("active");
-
       if(tabId === "calendar") renderCalendar();
       if(tabId === "tracker") renderTracker();
     }
 
-    async function generateContent(){
+    async function searchStories(){
+      const box = document.getElementById("storiesBox");
+      box.innerHTML = '<div class="empty">Buscando historias virales...</div>';
+
+      try{
+        const r = await fetch("/search-stories", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ niche: selectedNiche })
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+          box.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(data, null, 2)}</div></div>`;
+          return;
+        }
+
+        foundStories = data.stories || [];
+
+        if(!foundStories.length){
+          box.innerHTML = '<div class="empty">No se encontraron historias.</div>';
+          return;
+        }
+
+        box.innerHTML = foundStories.map((story, index) => `
+          <div class="story-card">
+            <h4>${story.title}</h4>
+            <div class="mini-note">${story.source || "Fuente desconocida"} · ${story.publishedAt ? new Date(story.publishedAt).toLocaleString() : ""}</div>
+            <div class="section" style="margin-top:10px;">
+              <div class="section-content">${story.description || "Sin descripción."}</div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" onclick="generateFromStory(${index})">⚡ Generar guion</button>
+              <a class="btn btn-secondary" href="${story.url}" target="_blank" rel="noopener noreferrer">🔗 Ver fuente</a>
+            </div>
+          </div>
+        `).join("");
+
+        showToast("Historias encontradas");
+      }catch(err){
+        box.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      }
+    }
+
+    async function generateFromStory(index){
+      const story = foundStories[index];
+      if(!story) return;
+
+      const platform = document.getElementById("platform").value;
+      const duration = document.getElementById("duration").value;
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerHTML = '<div class="empty">Generando guion...</div>';
+
+      try{
+        const r = await fetch("/generate", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            niche: selectedNiche,
+            platform,
+            duration,
+            topic: story.title,
+            sourceTitle: story.title,
+            sourceDescription: story.description,
+            sourceUrl: story.url
+          })
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+          resultBox.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(data, null, 2)}</div></div>`;
+          return;
+        }
+
+        latestGenerated = {
+          ...data.data,
+          niche: selectedNiche,
+          platform,
+          duration,
+          topic: story.title,
+          sourceUrl: story.url
+        };
+
+        renderResult(latestGenerated);
+        showToast("Guion generado");
+      }catch(err){
+        resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      }
+    }
+
+    async function generateFromManual(){
       const topic = document.getElementById("topic").value.trim();
       const platform = document.getElementById("platform").value;
       const duration = document.getElementById("duration").value;
 
       if(!topic){
-        showToast("Escribe un tema primero");
+        showToast("Escribe un tema o usa Buscar historias");
         return;
       }
 
       const resultBox = document.getElementById("resultBox");
       resultBox.innerHTML = '<div class="empty">Generando contenido...</div>';
 
-      try {
+      try{
         const r = await fetch("/generate", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
@@ -833,14 +481,7 @@
         const data = await r.json();
 
         if(!data.ok){
-          resultBox.innerHTML = `
-            <div class="result-card">
-              <div class="section">
-                <small>Error</small>
-                <div class="section-content">${JSON.stringify(data, null, 2)}</div>
-              </div>
-            </div>
-          `;
+          resultBox.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(data, null, 2)}</div></div>`;
           return;
         }
 
@@ -852,43 +493,30 @@
           topic
         };
 
-        saveHistory(latestGenerated);
         renderResult(latestGenerated);
-        renderHistory();
         showToast("Contenido generado");
-      } catch (err) {
-        resultBox.innerHTML = `
-          <div class="result-card">
-            <div class="section">
-              <small>Error</small>
-              <div class="section-content">${err.message}</div>
-            </div>
-          </div>
-        `;
+      }catch(err){
+        resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
       }
     }
 
     async function generateDailyPack(){
+      const platform = document.getElementById("platform").value;
+      const duration = document.getElementById("duration").value;
       const resultBox = document.getElementById("resultBox");
       resultBox.innerHTML = '<div class="empty">Generando pack diario...</div>';
 
-      try {
+      try{
         const r = await fetch("/generate-daily-pack", {
           method:"POST",
-          headers:{"Content-Type":"application/json"}
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ platform, duration })
         });
 
         const data = await r.json();
 
         if(!data.ok){
-          resultBox.innerHTML = `
-            <div class="result-card">
-              <div class="section">
-                <small>Error</small>
-                <div class="section-content">${JSON.stringify(data, null, 2)}</div>
-              </div>
-            </div>
-          `;
+          resultBox.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(data, null, 2)}</div></div>`;
           return;
         }
 
@@ -904,12 +532,7 @@
 
             ${latestDailyPack.map((item, idx) => {
               if(item.error){
-                return `
-                  <div class="section">
-                    <small>${idx + 1}. ${item.niche}</small>
-                    <div class="section-content">Error: ${item.error}</div>
-                  </div>
-                `;
+                return `<div class="section"><small>${idx + 1}. ${item.niche}</small><div class="section-content">Error: ${item.error}</div></div>`;
               }
 
               return `
@@ -923,21 +546,13 @@
         `;
 
         showToast("Pack diario generado");
-      } catch (err) {
-        resultBox.innerHTML = `
-          <div class="result-card">
-            <div class="section">
-              <small>Error</small>
-              <div class="section-content">${err.message}</div>
-            </div>
-          </div>
-        `;
+      }catch(err){
+        resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
       }
     }
 
     function renderResult(item){
       const box = document.getElementById("resultBox");
-
       const hashtagsText = (item.hashtags || []).map(tag => `#${tag}`).join(" ");
       const fullScript = `TÍTULO:\n${item.title}\n\nHOOK:\n${item.hook}\n\nDESARROLLO:\n${item.development}\n\nCTA:\n${item.cta}\n\nHASHTAGS:\n${hashtagsText}\n\nNOTAS VISUALES:\n${item.visual_notes}\n\nTIP DE ALGORITMO:\n${item.algorithm_tip}`;
       const capcutText = `GUÍA CAPCUT\n\n1. VOZ:\n${item.capcut_guide?.voice || ""}\n\n2. IMÁGENES / CLIPS:\n${(item.capcut_guide?.images || []).join("\n")}\n\n3. EDICIÓN:\n${item.capcut_guide?.editing || ""}\n\n4. TEXTO EN PANTALLA:\n${item.capcut_guide?.screen_text || ""}\n\n5. MÚSICA:\n${item.capcut_guide?.music || ""}\n\n6. EXPORTAR:\n${item.capcut_guide?.export || ""}`;
@@ -950,6 +565,7 @@
             <span class="tag">${item.niche}</span>
             <span class="tag">${item.platform}</span>
             <span class="tag">${item.duration}s</span>
+            ${item.sourceUrl ? `<a class="tag" href="${item.sourceUrl}" target="_blank" rel="noopener noreferrer">Fuente</a>` : ""}
           </div>
 
           <div class="actions" style="margin-bottom:18px;">
@@ -958,72 +574,26 @@
             <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(hashtagsText)})'>#️⃣ Copiar Hashtags</button>
             <button class="btn btn-secondary" onclick='copyText(${JSON.stringify(capcutText)})'>🎬 Copiar CapCut</button>
             <button class="btn btn-primary" onclick='exportTXT(${JSON.stringify(item.title)}, ${JSON.stringify(fullScript + "\\n\\n" + capcutText)})'>⬇️ Exportar TXT</button>
+            <button class="btn btn-secondary" onclick='saveToCalendar()'>📅 Calendario</button>
+            <button class="btn btn-secondary" onclick='saveToTracker()'>📊 Tracker</button>
           </div>
 
-          <div class="section">
-            <small>Hook</small>
-            <div class="section-content">${item.hook}</div>
-          </div>
-
-          <div class="section">
-            <small>Desarrollo</small>
-            <div class="section-content">${item.development}</div>
-          </div>
-
-          <div class="section">
-            <small>CTA</small>
-            <div class="section-content">${item.cta}</div>
-          </div>
-
-          <div class="section">
-            <small>Hashtags</small>
-            <div class="hashtags">
-              ${(item.hashtags || []).map(tag => `<span>#${tag}</span>`).join("")}
-            </div>
-          </div>
-
-          <div class="section">
-            <small>Notas visuales</small>
-            <div class="section-content">${item.visual_notes}</div>
-          </div>
-
-          <div class="section">
-            <small>Tip de algoritmo</small>
-            <div class="section-content">${item.algorithm_tip}</div>
-          </div>
+          <div class="section"><small>Hook</small><div class="section-content">${item.hook}</div></div>
+          <div class="section"><small>Desarrollo</small><div class="section-content">${item.development}</div></div>
+          <div class="section"><small>CTA</small><div class="section-content">${item.cta}</div></div>
+          <div class="section"><small>Hashtags</small><div class="hashtags">${(item.hashtags || []).map(tag => `<span>#${tag}</span>`).join("")}</div></div>
+          <div class="section"><small>Notas visuales</small><div class="section-content">${item.visual_notes}</div></div>
+          <div class="section"><small>Tip de algoritmo</small><div class="section-content">${item.algorithm_tip}</div></div>
 
           <details open>
             <summary>🎬 Guía de Producción CapCut</summary>
             <div class="details-body">
-              <div class="step">
-                <div class="step-title">1. Voz</div>
-                <div class="section-content">${item.capcut_guide?.voice || ""}</div>
-              </div>
-
-              <div class="step">
-                <div class="step-title">2. Imágenes / clips</div>
-                <div class="section-content">${(item.capcut_guide?.images || []).join("\n")}</div>
-              </div>
-
-              <div class="step">
-                <div class="step-title">3. Edición</div>
-                <div class="section-content">${item.capcut_guide?.editing || ""}</div>
-              </div>
-
-              <div class="step">
-                <div class="step-title">4. Texto en pantalla</div>
-                <div class="section-content">${item.capcut_guide?.screen_text || ""}</div>
-              </div>
-
-              <div class="step">
-                <div class="step-title">5. Música</div>
-                <div class="section-content">${item.capcut_guide?.music || ""}</div>
-              </div>
-
-              <div class="step">
-                <div class="step-title">6. Exportar</div>
-                <div class="section-content">${item.capcut_guide?.export || ""}</div>
-              </div>
+              <div class="step"><div class="step-title">1. Voz</div><div class="section-content">${item.capcut_guide?.voice || ""}</div></div>
+              <div class="step"><div class="step-title">2. Imágenes / clips</div><div class="section-content">${(item.capcut_guide?.images || []).join("\n")}</div></div>
+              <div class="step"><div class="step-title">3. Edición</div><div class="section-content">${item.capcut_guide?.editing || ""}</div></div>
+              <div class="step"><div class="step-title">4. Texto en pantalla</div><div class="section-content">${item.capcut_guide?.screen_text || ""}</div></div>
+              <div class="step"><div class="step-title">5. Música</div><div class="section-content">${item.capcut_guide?.music || ""}</div></div>
+              <div class="step"><div class="step-title">6. Exportar</div><div class="section-content">${item.capcut_guide?.export || ""}</div></div>
             </div>
           </details>
         </div>
@@ -1033,42 +603,9 @@
     function clearResult(){
       latestGenerated = null;
       latestDailyPack = [];
-      document.getElementById("resultBox").innerHTML =
-        '<div class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>';
-    }
-
-    function saveHistory(item){
-      historyItems.unshift({
-        title: item.title,
-        niche: item.niche,
-        platform: item.platform,
-        topic: item.topic
-      });
-
-      if(historyItems.length > 10){
-        historyItems.length = 10;
-      }
-
-      localStorage.setItem("cb_history", JSON.stringify(historyItems));
-    }
-
-    function renderHistory(){
-      const box = document.getElementById("historyBox");
-
-      if(!historyItems.length){
-        box.className = "empty";
-        box.textContent = "Todavía no has generado contenido.";
-        return;
-      }
-
-      box.className = "";
-      box.innerHTML = historyItems.map(item => `
-        <div class="result-card" style="margin-bottom:12px;">
-          <strong style="display:block; margin-bottom:6px;">${item.title}</strong>
-          <div class="mini-note">${item.niche} · ${item.platform}</div>
-          <div class="mini-note" style="margin-top:8px;">${item.topic}</div>
-        </div>
-      `).join("");
+      document.getElementById("resultBox").innerHTML = '<div class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>';
+      document.getElementById("storiesBox").innerHTML = '<div class="empty">Busca historias y aquí verás opciones reales para convertir en guion.</div>';
+      foundStories = [];
     }
 
     function saveToTracker(){
@@ -1121,14 +658,9 @@
       const lastDate = new Date(year, month + 1, 0).getDate();
 
       let html = "";
+      days.forEach(day => html += `<div class="calendar-head">${day}</div>`);
 
-      days.forEach(day => {
-        html += `<div class="calendar-head">${day}</div>`;
-      });
-
-      for(let i = 0; i < firstDay; i++){
-        html += `<div class="calendar-day"></div>`;
-      }
+      for(let i = 0; i < firstDay; i++) html += `<div class="calendar-day"></div>`;
 
       for(let d = 1; d <= lastDate; d++){
         const dateLabel = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
@@ -1137,11 +669,7 @@
         html += `
           <div class="calendar-day">
             <div class="calendar-num">${d}</div>
-            ${items.map(item => `
-              <div class="cal-item ${item.status === "Publicado" ? "published" : "scheduled"}">
-                ${item.title}
-              </div>
-            `).join("")}
+            ${items.map(item => `<div class="cal-item ${item.status === "Publicado" ? "published" : "scheduled"}">${item.title}</div>`).join("")}
           </div>
         `;
       }
@@ -1172,14 +700,14 @@
           <td>${item.niche}</td>
           <td>${item.platform}</td>
           <td>
-            <select class="status-select" onchange="updateStatus(${index}, this.value)">
+            <select onchange="updateStatus(${index}, this.value)">
               <option value="Borrador" ${item.status === "Borrador" ? "selected" : ""}>Borrador</option>
               <option value="Listo" ${item.status === "Listo" ? "selected" : ""}>Listo</option>
               <option value="Publicado" ${item.status === "Publicado" ? "selected" : ""}>Publicado</option>
             </select>
           </td>
           <td>
-            <input class="views-input" type="number" value="${item.views}" min="0" onchange="updateViews(${index}, this.value)" />
+            <input type="number" min="0" value="${item.views}" onchange="updateViews(${index}, this.value)" />
           </td>
         </tr>
       `).join("");
@@ -1220,7 +748,6 @@
       showToast("TXT exportado");
     }
 
-    renderHistory();
     renderCalendar();
     renderTracker();
   </script>
