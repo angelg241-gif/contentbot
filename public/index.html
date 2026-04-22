@@ -91,6 +91,10 @@
     .btn-primary{background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff}
     .btn-secondary{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
     .btn-danger{background:rgba(239,68,68,.1);color:#fecaca;border:1px solid rgba(239,68,68,.22)}
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
     .result-card,.story-card{
       background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);
       border:1px solid var(--line);border-radius:24px;padding:18px;margin-bottom:16px;
@@ -252,9 +256,9 @@
             </div>
 
             <div class="actions">
-              <button class="btn btn-primary" onclick="searchStories()">🔎 Buscar historias virales</button>
-              <button class="btn btn-secondary" onclick="generateAutomatic()">⚡ Generar historia automática</button>
-              <button class="btn btn-secondary" onclick="generateDailyPack()">📦 Generar pack diario</button>
+              <button id="btnSearchStories" class="btn btn-primary" onclick="searchStories()">🔎 Buscar historias virales</button>
+              <button id="btnGenerateAuto" class="btn btn-secondary" onclick="generateAutomatic()">⚡ Generar historia automática</button>
+              <button id="btnDailyPack" class="btn btn-secondary" onclick="generateDailyPack()">📦 Generar pack diario</button>
               <button class="btn btn-danger" onclick="clearResult()">🗑️ Limpiar</button>
             </div>
           </div>
@@ -317,6 +321,7 @@
     let latestGenerated = null;
     let latestDailyPack = [];
     let foundStories = [];
+    let isBusy = false;
 
     const trackerItems = JSON.parse(localStorage.getItem("cb_tracker") || "[]");
     const calendarItems = JSON.parse(localStorage.getItem("cb_calendar") || "[]");
@@ -326,6 +331,13 @@
       toast.textContent = message;
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function setBusy(state) {
+      isBusy = state;
+      document.getElementById("btnSearchStories").disabled = state;
+      document.getElementById("btnGenerateAuto").disabled = state;
+      document.getElementById("btnDailyPack").disabled = state;
     }
 
     async function login(){
@@ -362,6 +374,9 @@
     }
 
     async function searchStories(){
+      if (isBusy) return;
+      setBusy(true);
+
       const box = document.getElementById("storiesBox");
       box.innerHTML = '<div class="empty">Buscando historias virales...</div>';
 
@@ -403,12 +418,20 @@
         showToast("Historias encontradas");
       }catch(err){
         box.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      } finally {
+        setBusy(false);
       }
     }
 
     async function generateFromStory(index){
+      if (isBusy) return;
+      setBusy(true);
+
       const story = foundStories[index];
-      if(!story) return;
+      if(!story) {
+        setBusy(false);
+        return;
+      }
 
       const platform = document.getElementById("platform").value;
       const duration = document.getElementById("duration").value;
@@ -450,10 +473,15 @@
         showToast("Guion generado");
       }catch(err){
         resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      } finally {
+        setBusy(false);
       }
     }
 
     async function generateAutomatic(){
+      if (isBusy) return;
+      setBusy(true);
+
       const topic = document.getElementById("topic").value.trim();
       const platform = document.getElementById("platform").value;
       const duration = document.getElementById("duration").value;
@@ -461,68 +489,17 @@
       resultBox.innerHTML = '<div class="empty">Generando contenido...</div>';
 
       try{
-        if(!topic){
-          const searchRes = await fetch("/search-stories", {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({ niche: selectedNiche })
-          });
-
-          const searchData = await searchRes.json();
-
-          if(!searchData.ok || !searchData.stories || !searchData.stories.length){
-            resultBox.innerHTML = `<div class="result-card"><div class="section-content">No se encontraron historias automáticas.</div></div>`;
-            return;
-          }
-
-          foundStories = searchData.stories;
-          const story = searchData.stories[0];
-
-          const genRes = await fetch("/generate", {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({
-              niche: selectedNiche,
-              platform,
-              duration,
-              topic: story.title,
-              sourceTitle: story.title,
-              sourceDescription: story.description,
-              sourceUrl: story.url
-            })
-          });
-
-          const genData = await genRes.json();
-
-          if(!genData.ok){
-            resultBox.innerHTML = `<div class="result-card"><div class="section-content">${JSON.stringify(genData, null, 2)}</div></div>`;
-            return;
-          }
-
-          latestGenerated = {
-            ...genData.data,
-            niche: selectedNiche,
-            platform,
-            duration,
-            topic: story.title,
-            sourceUrl: story.url
-          };
-
-          renderResult(latestGenerated);
-          renderAutoStoriesPreview();
-          showToast("Historia automática generada");
-          return;
-        }
+        const payload = {
+          niche: selectedNiche,
+          platform,
+          duration,
+          topic
+        };
 
         const r = await fetch("/generate", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({
-            niche: selectedNiche,
-            platform,
-            duration,
-            topic
-          })
+          body:JSON.stringify(payload)
         });
 
         const data = await r.json();
@@ -537,13 +514,32 @@
           niche: selectedNiche,
           platform,
           duration,
-          topic
+          topic: topic || data.data.title,
+          sourceUrl: data.sourceUrl || ""
         };
 
         renderResult(latestGenerated);
-        showToast("Contenido generado");
+
+        if (!topic) {
+          try {
+            const searchRes = await fetch("/search-stories", {
+              method:"POST",
+              headers:{"Content-Type":"application/json"},
+              body:JSON.stringify({ niche: selectedNiche })
+            });
+            const searchData = await searchRes.json();
+            if (searchData.ok && searchData.stories) {
+              foundStories = searchData.stories;
+              renderAutoStoriesPreview();
+            }
+          } catch {}
+        }
+
+        showToast(topic ? "Contenido generado" : "Historia automática generada");
       }catch(err){
         resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      } finally {
+        setBusy(false);
       }
     }
 
@@ -564,6 +560,9 @@
     }
 
     async function generateDailyPack(){
+      if (isBusy) return;
+      setBusy(true);
+
       const platform = document.getElementById("platform").value;
       const duration = document.getElementById("duration").value;
       const resultBox = document.getElementById("resultBox");
@@ -610,6 +609,8 @@
         showToast("Pack diario generado");
       }catch(err){
         resultBox.innerHTML = `<div class="result-card"><div class="section-content">${err.message}</div></div>`;
+      } finally {
+        setBusy(false);
       }
     }
 

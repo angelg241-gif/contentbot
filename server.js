@@ -20,6 +20,28 @@ const client = new OpenAI({
   apiKey: OPENAI_API_KEY
 });
 
+const storyCache = {};
+const CACHE_TTL_MS = 10 * 60 * 1000;
+
+const recentGenerated = [];
+const dailyPackMemory = [];
+
+function pushRecent(item) {
+  recentGenerated.unshift({
+    ...item,
+    createdAt: new Date().toISOString()
+  });
+
+  if (recentGenerated.length > 50) {
+    recentGenerated.length = 50;
+  }
+}
+
+function setDailyPack(items) {
+  dailyPackMemory.length = 0;
+  dailyPackMemory.push(...items);
+}
+
 const nicheMap = {
   misterio:
     "Historias de misterio, terror psicológico, fenómenos inexplicables, tensión narrativa y casos inquietantes.",
@@ -82,6 +104,71 @@ const nicheQueries = {
   ]
 };
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isCacheFresh(niche) {
+  const hit = storyCache[niche];
+  if (!hit) return false;
+  return Date.now() - hit.timestamp < CACHE_TTL_MS;
+}
+
+function getFallbackStory(niche) {
+  const fallbackByNiche = {
+    historias_reales: {
+      title: "Un caso real tan extraño que parecía inventado",
+      description:
+        "Una historia impactante y realista sobre un evento difícil de creer, contada con tono viral y narrativo.",
+      url: ""
+    },
+    casos_sin_resolver: {
+      title: "La desaparición que nunca tuvo una respuesta clara",
+      description:
+        "Un caso sin resolver con preguntas abiertas, tensión y un fuerte gancho narrativo.",
+      url: ""
+    },
+    casos_resueltos: {
+      title: "El caso resuelto cuya verdad fue peor que las teorías",
+      description:
+        "Una investigación resuelta que dejó una verdad difícil de procesar.",
+      url: ""
+    },
+    crimen_perturbador: {
+      title: "El crimen real que dejó a todos intentando entender lo ocurrido",
+      description:
+        "Un caso oscuro y perturbador, contado de forma responsable y atrapante.",
+      url: ""
+    },
+    misterio: {
+      title: "El misterio que nadie logró explicar del todo",
+      description:
+        "Un suceso extraño e inquietante, perfecto para un guion viral con atmósfera.",
+      url: ""
+    },
+    curiosidades: {
+      title: "El dato tan raro que parece mentira, pero no lo es",
+      description:
+        "Una curiosidad sorprendente, con alto potencial de retención.",
+      url: ""
+    },
+    motivacion: {
+      title: "La historia que demuestra lo que pasa cuando alguien no se rinde",
+      description:
+        "Una historia inspiradora centrada en disciplina, resiliencia y transformación.",
+      url: ""
+    },
+    drama: {
+      title: "La polémica que cambió la imagen de alguien para siempre",
+      description:
+        "Un drama viral con tensión, conflicto y potencial de comentarios.",
+      url: ""
+    }
+  };
+
+  return fallbackByNiche[niche] || fallbackByNiche.historias_reales;
+}
+
 function buildSystemPrompt({ niche, platform, duration }) {
   return `
 Eres un estratega experto en contenido viral faceless para TikTok, Instagram Reels y YouTube Shorts.
@@ -143,9 +230,10 @@ async function generateScriptFromStory({
       {
         role: "user",
         content: `
-Convierte esta historia encontrada en internet en un guion viral en español.
+Convierte esta historia en internet en un guion viral en español.
 
-Tema principal: ${topic}
+Tema principal:
+${topic}
 
 Título fuente:
 ${sourceTitle || ""}
@@ -175,7 +263,7 @@ Hazlo ideal para ${platform} y ${duration} segundos.
   }
 }
 
-async function searchStoriesByNiche(niche, maxResults = 8) {
+async function fetchStoriesFromGNews(niche, maxResults = 8) {
   if (!GNEWS_API_KEY) {
     throw new Error("Falta GNEWS_API_KEY");
   }
@@ -195,13 +283,17 @@ async function searchStoriesByNiche(niche, maxResults = 8) {
 
     if (!response.ok) {
       throw new Error(
-        data?.errors?.join(", ") || data?.message || "Error consultando GNews"
+        data?.errors?.join(", ") ||
+          data?.message ||
+          "Error consultando GNews"
       );
     }
 
     for (const article of data.articles || []) {
       allArticles.push(article);
     }
+
+    await sleep(900);
   }
 
   const deduped = [];
@@ -223,6 +315,32 @@ async function searchStoriesByNiche(niche, maxResults = 8) {
   }
 
   return deduped.slice(0, maxResults);
+}
+
+async function searchStoriesByNiche(niche, maxResults = 8) {
+  if (isCacheFresh(niche)) {
+    return storyCache[niche].data.slice(0, maxResults);
+  }
+
+  const freshData = await fetchStoriesFromGNews(niche, maxResults);
+
+  storyCache[niche] = {
+    timestamp: Date.now(),
+    data: freshData
+  };
+
+  return freshData;
+}
+
+async function getStoriesWithFallback(niche, maxResults = 8) {
+  try {
+    const stories = await searchStoriesByNiche(niche, maxResults);
+    if (stories.length) return stories;
+  } catch (err) {
+    console.log("GNEWS FALLÓ:", err.message);
+  }
+
+  return [getFallbackStory(niche)];
 }
 
 app.post("/login", (req, res) => {
@@ -249,12 +367,13 @@ app.post("/search-stories", async (req, res) => {
       });
     }
 
-    const stories = await searchStoriesByNiche(niche, 10);
+    const stories = await getStoriesWithFallback(niche, 10);
 
     return res.json({
       ok: true,
       niche,
-      stories
+      stories,
+      cached: isCacheFresh(niche)
     });
   } catch (error) {
     console.error("ERROR /search-stories:", error);
@@ -265,6 +384,21 @@ app.post("/search-stories", async (req, res) => {
       details: error?.message || "Error desconocido"
     });
   }
+});
+
+app.get("/cache-status", (req, res) => {
+  const snapshot = Object.entries(storyCache).map(([niche, value]) => ({
+    niche,
+    count: value.data.length,
+    ageSeconds: Math.floor((Date.now() - value.timestamp) / 1000)
+  }));
+
+  res.json({
+    ok: true,
+    cache: snapshot,
+    recentGeneratedCount: recentGenerated.length,
+    dailyPackCount: dailyPackMemory.length
+  });
 });
 
 app.post("/generate", async (req, res) => {
@@ -298,9 +432,8 @@ app.post("/generate", async (req, res) => {
     let finalSourceDescription = sourceDescription;
     let finalSourceUrl = sourceUrl;
 
-    // Modo automático real: si no escribes tema, busca una historia solo
     if (!finalTopic || finalTopic.trim() === "") {
-      const stories = await searchStoriesByNiche(niche, 1);
+      const stories = await getStoriesWithFallback(niche, 1);
 
       if (!stories.length) {
         return res.status(404).json({
@@ -324,6 +457,16 @@ app.post("/generate", async (req, res) => {
       sourceTitle: finalSourceTitle,
       sourceDescription: finalSourceDescription,
       sourceUrl: finalSourceUrl
+    });
+
+    pushRecent({
+      niche,
+      platform,
+      duration,
+      topic: finalTopic,
+      sourceTitle: finalSourceTitle,
+      sourceUrl: finalSourceUrl,
+      data
     });
 
     return res.json({
@@ -364,10 +507,10 @@ app.post("/generate-daily-pack", async (req, res) => {
     const results = [];
 
     for (const niche of targetNiches) {
-      try {
-        const stories = await searchStoriesByNiche(niche, 2);
+      const stories = await getStoriesWithFallback(niche, 2);
 
-        for (const story of stories) {
+      for (const story of stories) {
+        try {
           const generated = await generateScriptFromStory({
             niche,
             platform,
@@ -378,19 +521,36 @@ app.post("/generate-daily-pack", async (req, res) => {
             sourceUrl: story.url
           });
 
-          results.push({
+          const item = {
             niche,
             source: story,
             data: generated
+          };
+
+          results.push(item);
+
+          pushRecent({
+            niche,
+            platform,
+            duration,
+            topic: story.title,
+            sourceTitle: story.title,
+            sourceUrl: story.url,
+            data: generated
+          });
+
+          await sleep(700);
+        } catch (err) {
+          results.push({
+            niche,
+            source: story,
+            error: err.message
           });
         }
-      } catch (err) {
-        results.push({
-          niche,
-          error: err.message
-        });
       }
     }
+
+    setDailyPack(results);
 
     return res.json({
       ok: true,
@@ -406,6 +566,20 @@ app.post("/generate-daily-pack", async (req, res) => {
       details: error?.message || "Error desconocido"
     });
   }
+});
+
+app.get("/recent-generated", (req, res) => {
+  res.json({
+    ok: true,
+    items: recentGenerated
+  });
+});
+
+app.get("/daily-pack-latest", (req, res) => {
+  res.json({
+    ok: true,
+    items: dailyPackMemory
+  });
 });
 
 app.get("/", (req, res) => {
