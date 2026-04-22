@@ -15,30 +15,79 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/generate", async (req, res) => {
-  const { prompt } = req.body;
-
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": CLAUDE_KEY,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
-      messages: [{ role: "user", content: prompt }]
-    })
-  });
-
-  const data = await r.json();
-  const text = (data.content || []).map(x => x.text || "").join("");
-
   try {
-    const json = JSON.parse(text.replace(/```json|```/g, "").trim());
-    res.json(json);
-  } catch {
-    res.status(500).json({ error: "Invalid JSON", raw: text });
+    const { prompt } = req.body;
+
+    if (!CLAUDE_KEY) {
+      return res.status(500).json({
+        error: "Falta CLAUDE_KEY en variables de entorno"
+      });
+    }
+
+    const fullPrompt = `
+Responde SOLO en JSON válido.
+No uses markdown.
+No uses backticks.
+No expliques nada fuera del JSON.
+
+Formato exacto:
+{
+  "respuesta": "tu respuesta aquí"
+}
+
+Prompt del usuario:
+${prompt}
+`;
+
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": CLAUDE_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1200,
+        messages: [{ role: "user", content: fullPrompt }]
+      })
+    });
+
+    const data = await r.json();
+
+    if (!r.ok) {
+      return res.status(500).json({
+        error: "Error API Claude",
+        details: data
+      });
+    }
+
+    const text = (data.content || []).map(x => x.text || "").join("").trim();
+
+    if (!text) {
+      return res.status(500).json({
+        error: "Claude devolvió respuesta vacía",
+        details: data
+      });
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      return res.status(500).json({
+        error: "Claude no devolvió JSON válido",
+        raw: text,
+        details: data
+      });
+    }
+
+    res.json(parsed);
+  } catch (err) {
+    res.status(500).json({
+      error: "Error interno del servidor",
+      details: err.message
+    });
   }
 });
 
