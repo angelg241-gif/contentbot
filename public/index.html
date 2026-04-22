@@ -3,58 +3,1085 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ContentBot</title>
+  <title>ContentBot Pro</title>
   <link rel="manifest" href="/manifest.json" />
+  <style>
+    :root{
+      --bg:#070b12;
+      --panel:#111827;
+      --panel-2:#182231;
+      --line:#253246;
+      --text:#edf2f7;
+      --muted:#95a3b8;
+      --accent:#7c3aed;
+      --accent-2:#06b6d4;
+      --good:#22c55e;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --card:#0f1724;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:
+      radial-gradient(circle at top left, rgba(124,58,237,.15), transparent 26%),
+      radial-gradient(circle at top right, rgba(6,182,212,.12), transparent 24%),
+      var(--bg);
+      color:var(--text);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body{min-height:100vh}
+
+    .app-shell{
+      width:min(1320px, calc(100% - 32px));
+      margin:24px auto;
+      display:grid;
+      grid-template-columns:280px 1fr;
+      gap:20px;
+    }
+
+    .sidebar{
+      background:linear-gradient(180deg, rgba(17,24,39,.95), rgba(10,16,25,.95));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      position:sticky;
+      top:24px;
+      height:fit-content;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:28px;
+    }
+
+    .logo{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-weight:800;
+      font-size:20px;
+      box-shadow:0 10px 30px rgba(124,58,237,.35);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:20px;
+      line-height:1;
+    }
+
+    .brand p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .menu{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .menu button{
+      width:100%;
+      background:transparent;
+      color:var(--text);
+      border:1px solid transparent;
+      border-radius:16px;
+      padding:14px 16px;
+      text-align:left;
+      cursor:pointer;
+      transition:.2s ease;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .menu button:hover{
+      background:rgba(255,255,255,.03);
+      border-color:var(--line);
+    }
+
+    .menu button.active{
+      background:linear-gradient(135deg, rgba(124,58,237,.18), rgba(6,182,212,.12));
+      border-color:rgba(124,58,237,.4);
+    }
+
+    .side-card{
+      margin-top:22px;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px;
+    }
+
+    .side-card h3{
+      margin:0 0 10px;
+      font-size:14px;
+    }
+
+    .side-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .main{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(124,58,237,.16), rgba(6,182,212,.12)),
+        var(--panel);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size:32px;
+      line-height:1.05;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      max-width:800px;
+      line-height:1.7;
+    }
+
+    .tab{
+      display:none;
+    }
+
+    .tab.active{
+      display:block;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .panel h3{
+      margin:0 0 18px;
+      font-size:18px;
+    }
+
+    .field{
+      margin-bottom:18px;
+    }
+
+    .field label{
+      display:block;
+      margin-bottom:8px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip{
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      transition:.2s ease;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .chip:hover{transform:translateY(-1px)}
+    .chip.active{
+      border-color:rgba(124,58,237,.5);
+      background:linear-gradient(135deg, rgba(124,58,237,.22), rgba(6,182,212,.1));
+    }
+
+    select, textarea, input{
+      width:100%;
+      background:#0b1220;
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      outline:none;
+    }
+
+    textarea{
+      min-height:140px;
+      resize:vertical;
+      line-height:1.6;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:16px;
+      padding:14px 18px;
+      font-size:14px;
+      font-weight:800;
+      transition:.2s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg, var(--accent), #5b21b6);
+      color:#fff;
+      box-shadow:0 12px 30px rgba(124,58,237,.35);
+    }
+
+    .btn-primary:hover{transform:translateY(-1px)}
+
+    .btn-secondary{
+      background:var(--panel-2);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .btn-danger{
+      background:rgba(239,68,68,.1);
+      color:#fecaca;
+      border:1px solid rgba(239,68,68,.25);
+    }
+
+    .result-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:20px;
+      margin-bottom:18px;
+    }
+
+    .result-title{
+      font-size:22px;
+      margin:0 0 14px;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:16px;
+    }
+
+    .tag{
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--line);
+      color:var(--muted);
+    }
+
+    .section{
+      margin-bottom:16px;
+    }
+
+    .section small{
+      display:block;
+      color:var(--muted);
+      margin-bottom:8px;
+      font-size:12px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .section-content{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      white-space:pre-wrap;
+      line-height:1.7;
+    }
+
+    .hashtags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .hashtags span{
+      font-size:13px;
+      color:#c4b5fd;
+      background:rgba(124,58,237,.14);
+      border:1px solid rgba(124,58,237,.26);
+      padding:8px 10px;
+      border-radius:999px;
+    }
+
+    details{
+      border:1px solid var(--line);
+      border-radius:20px;
+      overflow:hidden;
+      background:rgba(255,255,255,.03);
+    }
+
+    summary{
+      cursor:pointer;
+      list-style:none;
+      padding:16px 18px;
+      font-weight:800;
+      background:rgba(255,255,255,.03);
+    }
+
+    summary::-webkit-details-marker{display:none}
+
+    .details-body{
+      padding:0 18px 18px;
+    }
+
+    .step{
+      margin-top:14px;
+    }
+
+    .step-title{
+      font-size:13px;
+      font-weight:800;
+      color:#93c5fd;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .mini-note{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .empty{
+      color:var(--muted);
+      text-align:center;
+      padding:50px 20px;
+      border:1px dashed var(--line);
+      border-radius:24px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .calendar-wrap{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:10px;
+    }
+
+    .calendar-head{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+      text-align:center;
+      padding:8px 0;
+      text-transform:uppercase;
+    }
+
+    .calendar-day{
+      min-height:120px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+      background:var(--card);
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .calendar-num{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .cal-item{
+      font-size:12px;
+      padding:8px;
+      border-radius:12px;
+      line-height:1.4;
+    }
+
+    .scheduled{background:rgba(245,158,11,.14); color:#fde68a; border:1px solid rgba(245,158,11,.22);}
+    .published{background:rgba(34,197,94,.14); color:#bbf7d0; border:1px solid rgba(34,197,94,.22);}
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+    }
+
+    th,td{
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      padding:14px 10px;
+      vertical-align:top;
+      font-size:14px;
+    }
+
+    th{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .stat{
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      background:var(--card);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:28px;
+      margin-bottom:6px;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .login-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(4,8,15,.82);
+      backdrop-filter:blur(14px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:99;
+      padding:20px;
+    }
+
+    .login-card{
+      width:min(420px, 100%);
+      background:linear-gradient(180deg, rgba(17,24,39,.98), rgba(10,16,25,.98));
+      border:1px solid var(--line);
+      border-radius:30px;
+      padding:28px;
+      box-shadow:var(--shadow);
+    }
+
+    .login-card h2{
+      margin:0 0 10px;
+      font-size:28px;
+    }
+
+    .login-card p{
+      margin:0 0 20px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .toast{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      background:var(--panel);
+      border:1px solid var(--line);
+      color:var(--text);
+      padding:14px 16px;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      opacity:0;
+      transform:translateY(10px);
+      pointer-events:none;
+      transition:.22s ease;
+      z-index:120;
+      max-width:320px;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    @media (max-width: 1100px){
+      .app-shell{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:relative;
+        top:0;
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .stat-grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width: 640px){
+      .hero h2{font-size:24px}
+      .row{grid-template-columns:1fr}
+      .calendar-wrap{grid-template-columns:repeat(2,1fr)}
+      .stat-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
-<body style="background:#080a0f;color:white;font-family:sans-serif;padding:20px">
-
-  <div id="login">
-    <h1>ContentBot</h1>
-    <input type="password" id="pass" placeholder="Password" style="padding:10px;width:260px;" />
-    <button onclick="login()" style="padding:10px 14px;">Enter</button>
+<body>
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <div class="logo" style="margin-bottom:18px;">C</div>
+      <h2>ContentBot Pro</h2>
+      <p>Generador de guiones virales, calendario editorial y tracker de videos. Entra con tu contraseña para usar tu panel.</p>
+      <div class="field">
+        <label>Contraseña</label>
+        <input id="pass" type="password" placeholder="Escribe tu contraseña" />
+      </div>
+      <button class="btn btn-primary" onclick="login()">Entrar</button>
+    </div>
   </div>
 
-  <div id="app" style="display:none">
-    <h1>ContentBot</h1>
-    <textarea id="prompt" style="width:100%;height:120px;" placeholder="Escribe tu prompt aquí..."></textarea>
-    <br /><br />
-    <button onclick="generate()" style="padding:10px 14px;">Generate</button>
-    <pre id="output" style="white-space:pre-wrap;margin-top:20px;"></pre>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div>
+          <h1>ContentBot Pro</h1>
+          <p>Faceless content system</p>
+        </div>
+      </div>
+
+      <div class="menu">
+        <button class="active" onclick="switchTab('generator', this)">✍️ Generador</button>
+        <button onclick="switchTab('calendar', this)">📅 Calendario</button>
+        <button onclick="switchTab('tracker', this)">📊 Tracker</button>
+      </div>
+
+      <div class="side-card">
+        <h3>Flujo recomendado</h3>
+        <p>Bot → ElevenLabs → Pexels/Higgsfield → CapCut → subida manual. Esa es la forma más sólida para crecer sin depender de autoposting.</p>
+      </div>
+
+      <div class="side-card">
+        <h3>Nichos activos</h3>
+        <p>Misterio / terror, curiosidades virales, motivación / éxito y drama / gossip de internet.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <h2>Crea contenido viral con look profesional</h2>
+        <p>Genera guiones completos, guía de producción CapCut, ideas visuales, calendario de publicación y seguimiento de videos desde un solo panel.</p>
+      </section>
+
+      <section id="tab-generator" class="tab active">
+        <div class="grid">
+          <div class="panel">
+            <h3>Generador de guiones virales</h3>
+
+            <div class="field">
+              <label>Nicho</label>
+              <div class="chips" id="nicheChips">
+                <button class="chip active" data-value="misterio">🕵️ Misterio / Terror</button>
+                <button class="chip" data-value="curiosidades">🤯 Curiosidades</button>
+                <button class="chip" data-value="motivacion">💪 Motivación / Éxito</button>
+                <button class="chip" data-value="drama">🍿 Drama / Gossip</button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>Plataforma</label>
+                <select id="platform">
+                  <option value="TikTok">TikTok</option>
+                  <option value="Instagram Reels">Instagram Reels</option>
+                  <option value="YouTube Shorts">YouTube Shorts</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Duración</label>
+                <select id="duration">
+                  <option value="30">30 segundos</option>
+                  <option value="60" selected>60 segundos</option>
+                  <option value="90">90 segundos</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Tema / idea base</label>
+              <textarea id="topic" placeholder="Ejemplo: La historia real de un hotel donde desaparecieron huéspedes sin explicación..."></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" onclick="generateContent()">⚡ Generar contenido</button>
+              <button class="btn btn-secondary" onclick="saveToCalendar()">📅 Enviar al calendario</button>
+              <button class="btn btn-secondary" onclick="saveToTracker()">📊 Enviar al tracker</button>
+              <button class="btn btn-danger" onclick="clearResult()">🗑️ Limpiar</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Historial rápido</h3>
+            <div id="historyBox" class="empty">Todavía no has generado contenido.</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:20px;">
+          <h3>Resultado</h3>
+          <div id="resultBox" class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>
+        </div>
+      </section>
+
+      <section id="tab-calendar" class="tab">
+        <div class="panel">
+          <h3>Calendario de publicación</h3>
+          <div class="calendar-wrap" id="calendarGrid"></div>
+        </div>
+      </section>
+
+      <section id="tab-tracker" class="tab">
+        <div class="panel">
+          <h3>Tracker de videos</h3>
+          <div class="stat-grid">
+            <div class="stat">
+              <strong id="statTotal">0</strong>
+              <span>Total videos</span>
+            </div>
+            <div class="stat">
+              <strong id="statDraft">0</strong>
+              <span>Borradores</span>
+            </div>
+            <div class="stat">
+              <strong id="statPublished">0</strong>
+              <span>Publicados</span>
+            </div>
+            <div class="stat">
+              <strong id="statViews">0</strong>
+              <span>Vistas totales</span>
+            </div>
+          </div>
+
+          <div style="overflow:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Nicho</th>
+                  <th>Plataforma</th>
+                  <th>Estado</th>
+                  <th>Vistas</th>
+                </tr>
+              </thead>
+              <tbody id="trackerTable">
+                <tr>
+                  <td colspan="5" class="mini-note">Todavía no hay videos registrados.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
+
+  <div id="toast" class="toast"></div>
 
   <script>
+    let selectedNiche = "misterio";
+    let latestGenerated = null;
+
+    const historyItems = JSON.parse(localStorage.getItem("cb_history") || "[]");
+    const trackerItems = JSON.parse(localStorage.getItem("cb_tracker") || "[]");
+    const calendarItems = JSON.parse(localStorage.getItem("cb_calendar") || "[]");
+
+    function showToast(message){
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
     async function login(){
+      const password = document.getElementById("pass").value;
+
       const r = await fetch("/login", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({password:document.getElementById("pass").value})
+        body:JSON.stringify({ password })
       });
 
       if(r.ok){
-        document.getElementById("login").style.display="none";
-        document.getElementById("app").style.display="block";
+        document.getElementById("loginOverlay").style.display = "none";
+        showToast("Acceso correcto");
       } else {
-        alert("Wrong password");
+        showToast("Contraseña incorrecta");
       }
     }
 
-    async function generate(){
-      const prompt = document.getElementById("prompt").value;
+    document.querySelectorAll("#nicheChips .chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#nicheChips .chip").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedNiche = btn.dataset.value;
+      });
+    });
 
-      const r = await fetch("/generate", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({prompt})
+    function switchTab(tabId, button){
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.getElementById(`tab-${tabId}`).classList.add("active");
+
+      document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+      button.classList.add("active");
+
+      if(tabId === "calendar") renderCalendar();
+      if(tabId === "tracker") renderTracker();
+    }
+
+    async function generateContent(){
+      const topic = document.getElementById("topic").value.trim();
+      const platform = document.getElementById("platform").value;
+      const duration = document.getElementById("duration").value;
+
+      if(!topic){
+        showToast("Escribe un tema primero");
+        return;
+      }
+
+      const resultBox = document.getElementById("resultBox");
+      resultBox.innerHTML = '<div class="empty">Generando contenido...</div>';
+
+      try {
+        const r = await fetch("/generate", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            niche: selectedNiche,
+            platform,
+            duration,
+            topic
+          })
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+          resultBox.innerHTML = `
+            <div class="result-card">
+              <div class="section">
+                <small>Error</small>
+                <div class="section-content">${JSON.stringify(data, null, 2)}</div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        latestGenerated = {
+          ...data.data,
+          niche: selectedNiche,
+          platform,
+          duration,
+          topic
+        };
+
+        saveHistory(latestGenerated);
+        renderResult(latestGenerated);
+        renderHistory();
+        showToast("Contenido generado");
+      } catch (err) {
+        resultBox.innerHTML = `
+          <div class="result-card">
+            <div class="section">
+              <small>Error</small>
+              <div class="section-content">${err.message}</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function renderResult(item){
+      const box = document.getElementById("resultBox");
+
+      box.innerHTML = `
+        <div class="result-card">
+          <h2 class="result-title">${item.title}</h2>
+
+          <div class="meta">
+            <span class="tag">${item.niche}</span>
+            <span class="tag">${item.platform}</span>
+            <span class="tag">${item.duration}s</span>
+          </div>
+
+          <div class="section">
+            <small>Hook</small>
+            <div class="section-content">${item.hook}</div>
+          </div>
+
+          <div class="section">
+            <small>Desarrollo</small>
+            <div class="section-content">${item.development}</div>
+          </div>
+
+          <div class="section">
+            <small>CTA</small>
+            <div class="section-content">${item.cta}</div>
+          </div>
+
+          <div class="section">
+            <small>Hashtags</small>
+            <div class="hashtags">
+              ${(item.hashtags || []).map(tag => `<span>#${tag}</span>`).join("")}
+            </div>
+          </div>
+
+          <div class="section">
+            <small>Notas visuales</small>
+            <div class="section-content">${item.visual_notes}</div>
+          </div>
+
+          <div class="section">
+            <small>Tip de algoritmo</small>
+            <div class="section-content">${item.algorithm_tip}</div>
+          </div>
+
+          <details open>
+            <summary>🎬 Guía de Producción CapCut</summary>
+            <div class="details-body">
+              <div class="step">
+                <div class="step-title">1. Voz</div>
+                <div class="section-content">${item.capcut_guide?.voice || ""}</div>
+              </div>
+
+              <div class="step">
+                <div class="step-title">2. Imágenes / clips</div>
+                <div class="section-content">${(item.capcut_guide?.images || []).join("\n")}</div>
+              </div>
+
+              <div class="step">
+                <div class="step-title">3. Edición</div>
+                <div class="section-content">${item.capcut_guide?.editing || ""}</div>
+              </div>
+
+              <div class="step">
+                <div class="step-title">4. Texto en pantalla</div>
+                <div class="section-content">${item.capcut_guide?.screen_text || ""}</div>
+              </div>
+
+              <div class="step">
+                <div class="step-title">5. Música</div>
+                <div class="section-content">${item.capcut_guide?.music || ""}</div>
+              </div>
+
+              <div class="step">
+                <div class="step-title">6. Exportar</div>
+                <div class="section-content">${item.capcut_guide?.export || ""}</div>
+              </div>
+            </div>
+          </details>
+        </div>
+      `;
+    }
+
+    function clearResult(){
+      latestGenerated = null;
+      document.getElementById("resultBox").innerHTML =
+        '<div class="empty">Aquí aparecerá tu guion, hashtags, notas visuales y guía de producción CapCut.</div>';
+    }
+
+    function saveHistory(item){
+      historyItems.unshift({
+        title: item.title,
+        niche: item.niche,
+        platform: item.platform,
+        topic: item.topic
       });
 
-      const data = await r.json();
-
-      if (data.respuesta) {
-        document.getElementById("output").textContent = data.respuesta;
-      } else {
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      if(historyItems.length > 8){
+        historyItems.length = 8;
       }
+
+      localStorage.setItem("cb_history", JSON.stringify(historyItems));
     }
+
+    function renderHistory(){
+      const box = document.getElementById("historyBox");
+
+      if(!historyItems.length){
+        box.className = "empty";
+        box.textContent = "Todavía no has generado contenido.";
+        return;
+      }
+
+      box.className = "";
+      box.innerHTML = historyItems.map(item => `
+        <div class="result-card" style="margin-bottom:12px;">
+          <strong style="display:block; margin-bottom:6px;">${item.title}</strong>
+          <div class="mini-note">${item.niche} · ${item.platform}</div>
+          <div class="mini-note" style="margin-top:8px;">${item.topic}</div>
+        </div>
+      `).join("");
+    }
+
+    function saveToTracker(){
+      if(!latestGenerated){
+        showToast("Primero genera un contenido");
+        return;
+      }
+
+      trackerItems.unshift({
+        title: latestGenerated.title,
+        niche: latestGenerated.niche,
+        platform: latestGenerated.platform,
+        status: "Borrador",
+        views: 0
+      });
+
+      localStorage.setItem("cb_tracker", JSON.stringify(trackerItems));
+      renderTracker();
+      showToast("Enviado al tracker");
+    }
+
+    function saveToCalendar(){
+      if(!latestGenerated){
+        showToast("Primero genera un contenido");
+        return;
+      }
+
+      const today = new Date();
+      const dateLabel = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+
+      calendarItems.unshift({
+        date: dateLabel,
+        title: latestGenerated.title,
+        status: "Programado"
+      });
+
+      localStorage.setItem("cb_calendar", JSON.stringify(calendarItems));
+      renderCalendar();
+      showToast("Enviado al calendario");
+    }
+
+    function renderCalendar(){
+      const grid = document.getElementById("calendarGrid");
+      const days = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDate = new Date(year, month + 1, 0).getDate();
+
+      let html = "";
+
+      days.forEach(day => {
+        html += `<div class="calendar-head">${day}</div>`;
+      });
+
+      for(let i = 0; i < firstDay; i++){
+        html += `<div class="calendar-day"></div>`;
+      }
+
+      for(let d = 1; d <= lastDate; d++){
+        const dateLabel = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const items = calendarItems.filter(x => x.date === dateLabel);
+
+        html += `
+          <div class="calendar-day">
+            <div class="calendar-num">${d}</div>
+            ${items.map(item => `
+              <div class="cal-item ${item.status === "Publicado" ? "published" : "scheduled"}">
+                ${item.title}
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    function renderTracker(){
+      const body = document.getElementById("trackerTable");
+      const total = trackerItems.length;
+      const published = trackerItems.filter(x => x.status === "Publicado").length;
+      const draft = trackerItems.filter(x => x.status === "Borrador").length;
+      const views = trackerItems.reduce((acc, item) => acc + Number(item.views || 0), 0);
+
+      document.getElementById("statTotal").textContent = total;
+      document.getElementById("statDraft").textContent = draft;
+      document.getElementById("statPublished").textContent = published;
+      document.getElementById("statViews").textContent = views;
+
+      if(!trackerItems.length){
+        body.innerHTML = `<tr><td colspan="5" class="mini-note">Todavía no hay videos registrados.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = trackerItems.map(item => `
+        <tr>
+          <td>${item.title}</td>
+          <td>${item.niche}</td>
+          <td>${item.platform}</td>
+          <td>${item.status}</td>
+          <td>${item.views}</td>
+        </tr>
+      `).join("");
+    }
+
+    renderHistory();
+    renderCalendar();
+    renderTracker();
   </script>
 </body>
 </html>
