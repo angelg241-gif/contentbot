@@ -1,94 +1,64 @@
 import express from "express";
-import fetch from "node-fetch";
+import path from "path";
+import OpenAI from "openai";
 
 const app = express();
+
+// Middlewares
 app.use(express.json());
 app.use(express.static("public"));
 
+// Variables
 const PORT = process.env.PORT || 3000;
 const PASSWORD = process.env.APP_PASSWORD || "1234";
-const CLAUDE_KEY = process.env.CLAUDE_KEY || "";
 
-app.post("/login", (req, res) => {
-  if (req.body.password === PASSWORD) return res.json({ ok: true });
-  res.status(401).send("Wrong password");
+// OpenAI config
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
+// 🔐 Login simple
+app.post("/login", (req, res) => {
+  if (req.body.password === PASSWORD) {
+    return res.json({ ok: true });
+  }
+  res.status(401).json({ error: "Wrong password" });
+});
+
+// 🧠 Generador de contenido (OpenAI)
 app.post("/generate", async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    if (!CLAUDE_KEY) {
-      return res.status(500).json({
-        error: "Falta CLAUDE_KEY en variables de entorno"
-      });
+    if (!prompt) {
+      return res.status(400).json({ error: "No prompt provided" });
     }
 
-    const fullPrompt = `
-Responde SOLO en JSON válido.
-No uses markdown.
-No uses backticks.
-No expliques nada fuera del JSON.
-
-Formato exacto:
-{
-  "respuesta": "tu respuesta aquí"
-}
-
-Prompt del usuario:
-${prompt}
-`;
-
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": CLAUDE_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1200,
-        messages: [{ role: "user", content: fullPrompt }]
-      })
+    const response = await client.responses.create({
+      model: "gpt-5.3",
+      input: `Responde en español, estilo contenido viral para redes (TikTok/Instagram), directo y poderoso:\n\n${prompt}`
     });
 
-    const data = await r.json();
+    res.json({
+      respuesta: response.output_text
+    });
 
-    if (!r.ok) {
-      return res.status(500).json({
-        error: "Error API Claude",
-        details: data
-      });
-    }
+  } catch (error) {
+    console.error("ERROR:", error);
 
-    const text = (data.content || []).map(x => x.text || "").join("").trim();
-
-    if (!text) {
-      return res.status(500).json({
-        error: "Claude devolvió respuesta vacía",
-        details: data
-      });
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      return res.status(500).json({
-        error: "Claude no devolvió JSON válido",
-        raw: text,
-        details: data
-      });
-    }
-
-    res.json(parsed);
-  } catch (err) {
     res.status(500).json({
-      error: "Error interno del servidor",
-      details: err.message
+      error: "Error generando contenido",
+      details: error.message
     });
   }
 });
 
-app.listen(PORT, () => console.log("Running on " + PORT));
+// 🌐 Ruta principal (FIX para Render)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "public", "index.html"));
+});
+
+// 🚀 Start server
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
